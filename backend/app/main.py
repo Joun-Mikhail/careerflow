@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 
 from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
@@ -79,7 +80,11 @@ def _configure_exception_handlers(app: FastAPI) -> None:
     async def handle_validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
         return JSONResponse(
             status_code=422,
-            content=_error_body("validation_error", "Request validation failed.", exc.errors()),
+            content=_error_body(
+                "validation_error",
+                "Request validation failed.",
+                jsonable_encoder(exc.errors()),
+            ),
         )
 
     @app.exception_handler(Exception)

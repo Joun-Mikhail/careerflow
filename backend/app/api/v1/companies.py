@@ -41,17 +41,13 @@ def list_companies(
     status_code=status.HTTP_201_CREATED,
     summary="Create a company",
 )
-def create_company(
-    data: CompanyCreate, current_user: CurrentUser, db: DbSession
-) -> CompanyRead:
+def create_company(data: CompanyCreate, current_user: CurrentUser, db: DbSession) -> CompanyRead:
     company = CompanyService(db).create(current_user, data)
     return CompanyRead.model_validate(company)
 
 
 @router.get("/{company_id}", response_model=CompanyRead, summary="Get a company")
-def get_company(
-    company_id: UUID, current_user: CurrentUser, db: DbSession
-) -> CompanyRead:
+def get_company(company_id: UUID, current_user: CurrentUser, db: DbSession) -> CompanyRead:
     return CompanyRead.model_validate(CompanyService(db).get(current_user, company_id))
 
 

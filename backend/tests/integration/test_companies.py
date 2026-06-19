@@ -36,9 +36,7 @@ def test_get_company(client: TestClient, auth_headers: dict[str, str]) -> None:
     assert response.json()["name"] == "Acme Corp"
 
 
-def test_get_missing_company_returns_404(
-    client: TestClient, auth_headers: dict[str, str]
-) -> None:
+def test_get_missing_company_returns_404(client: TestClient, auth_headers: dict[str, str]) -> None:
     response = client.get(
         "/api/v1/companies/00000000-0000-0000-0000-000000000000", headers=auth_headers
     )
@@ -64,13 +62,10 @@ def test_delete_company_is_soft_and_hidden_afterwards(
 ) -> None:
     created = _create(client, auth_headers)
     assert (
-        client.delete(f"/api/v1/companies/{created['id']}", headers=auth_headers).status_code
-        == 204
+        client.delete(f"/api/v1/companies/{created['id']}", headers=auth_headers).status_code == 204
     )
     # Soft-deleted companies are not retrievable or listed.
-    assert (
-        client.get(f"/api/v1/companies/{created['id']}", headers=auth_headers).status_code == 404
-    )
+    assert client.get(f"/api/v1/companies/{created['id']}", headers=auth_headers).status_code == 404
     listing = client.get("/api/v1/companies", headers=auth_headers).json()
     assert listing["total"] == 0
 

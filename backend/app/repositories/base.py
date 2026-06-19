@@ -78,8 +78,6 @@ class BaseRepository(Generic[ModelT]):
 
     # -- Helpers -------------------------------------------------------------
     @staticmethod
-    def ilike_contains(
-        column: InstrumentedAttribute[str], term: str
-    ) -> ColumnElement[bool]:
+    def ilike_contains(column: InstrumentedAttribute[str], term: str) -> ColumnElement[bool]:
         """Case-insensitive ``contains`` predicate for search inputs."""
         return column.ilike(f"%{term}%")
