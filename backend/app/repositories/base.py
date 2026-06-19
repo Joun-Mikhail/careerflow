@@ -11,9 +11,8 @@ from __future__ import annotations
 from typing import Generic, TypeVar
 from uuid import UUID
 
-from sqlalchemy import Select, func, select
-from sqlalchemy.orm import Session
-from sqlalchemy.sql.elements import ColumnElement
+from sqlalchemy import ColumnElement, Select, func, select
+from sqlalchemy.orm import InstrumentedAttribute, Session
 
 from app.core.database import Base
 from app.core.pagination import PageParams
@@ -79,6 +78,8 @@ class BaseRepository(Generic[ModelT]):
 
     # -- Helpers -------------------------------------------------------------
     @staticmethod
-    def ilike_contains(column: ColumnElement[str], term: str) -> ColumnElement[bool]:
+    def ilike_contains(
+        column: InstrumentedAttribute[str], term: str
+    ) -> ColumnElement[bool]:
         """Case-insensitive ``contains`` predicate for search inputs."""
         return column.ilike(f"%{term}%")
