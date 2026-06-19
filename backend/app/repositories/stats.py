@@ -8,7 +8,7 @@ the data volumes for a personal job search make this comfortably cheap.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -69,8 +69,16 @@ class StatsRepository:
             .where(Application.user_id == owner_id)
             .where(Application.deleted_at.is_(None))
         )
-        dates = [row[0] for row in self.session.execute(stmt)]
-        return [d for d in dates if d is not None and d >= since]
+        result: list[datetime] = []
+        for (value,) in self.session.execute(stmt):
+            if value is None:
+                continue
+            # SQLite returns naive datetimes even for timezone columns; treat
+            # them as UTC so comparisons against an aware boundary are valid.
+            normalized = value if value.tzinfo is not None else value.replace(tzinfo=UTC)
+            if normalized >= since:
+                result.append(normalized)
+        return result
 
     # -- Interviews ----------------------------------------------------------
     def count_interviews(self, owner_id: UUID) -> int:
