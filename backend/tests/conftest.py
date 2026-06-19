@@ -9,6 +9,7 @@ worker threads.
 from __future__ import annotations
 
 import os
+import tempfile
 
 # Configure a deterministic, test-only environment *before* importing any app
 # module, since settings are parsed and cached on first import.
@@ -16,6 +17,7 @@ os.environ.setdefault("CAREERFLOW_ENV", "test")
 os.environ.setdefault("DEBUG", "true")
 os.environ.setdefault("JWT_SECRET", "test-secret-key-at-least-32-bytes-long-000")
 os.environ.setdefault("DATABASE_URL", "sqlite://")
+os.environ.setdefault("UPLOAD_DIR", os.path.join(tempfile.gettempdir(), "careerflow_test_uploads"))
 
 from collections.abc import Iterator
 
