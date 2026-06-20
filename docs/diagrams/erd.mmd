@@ -1,0 +1,60 @@
+erDiagram
+    USERS ||--o{ COMPANIES : owns
+    USERS ||--o{ APPLICATIONS : owns
+    USERS ||--o{ TASKS : owns
+    COMPANIES ||--o{ APPLICATIONS : "linked to (nullable)"
+    APPLICATIONS ||--o{ INTERVIEWS : has
+    APPLICATIONS ||--o{ NOTES : has
+    APPLICATIONS ||--o{ ATTACHMENTS : has
+    APPLICATIONS |o--o{ TASKS : "may relate to"
+
+    USERS {
+        uuid id PK
+        string email UK
+        string hashed_password
+        string full_name
+        bool is_active
+    }
+    COMPANIES {
+        uuid id PK
+        uuid user_id FK
+        string name
+        string industry
+        datetime deleted_at
+    }
+    APPLICATIONS {
+        uuid id PK
+        uuid user_id FK
+        uuid company_id FK
+        string role_title
+        enum status
+        int salary_min
+        int salary_max
+        datetime applied_at
+        datetime deleted_at
+    }
+    INTERVIEWS {
+        uuid id PK
+        uuid application_id FK
+        datetime scheduled_at
+        enum mode
+        enum result
+    }
+    TASKS {
+        uuid id PK
+        uuid application_id FK
+        string title
+        enum priority
+        bool is_completed
+    }
+    NOTES {
+        uuid id PK
+        uuid application_id FK
+        text body
+    }
+    ATTACHMENTS {
+        uuid id PK
+        uuid application_id FK
+        enum kind
+        string stored_filename
+    }

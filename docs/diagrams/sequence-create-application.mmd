@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    participant B as Browser (SPA)
+    participant R as Router (api/)
+    participant S as ApplicationService
+    participant Repo as Repositories
+    participant DB as PostgreSQL
+
+    B->>R: POST /api/v1/applications (Bearer JWT)
+    R->>R: Validate body (Pydantic) + decode JWT
+    R->>S: create(owner, data)
+    opt company_id provided
+        S->>Repo: company owned by user?
+        Repo->>DB: SELECT company WHERE id AND user_id
+        DB-->>Repo: row / none
+        Repo-->>S: Company or NotFound(404)
+    end
+    S->>Repo: add(application)
+    Repo->>DB: INSERT application
+    DB-->>Repo: persisted row
+    S-->>R: Application
+    R-->>B: 201 Created (ApplicationRead)

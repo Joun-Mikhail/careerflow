@@ -1,0 +1,26 @@
+flowchart LR
+    subgraph Browser
+        SPA["React SPA<br/>Vite · TanStack Query · Recharts"]
+    end
+
+    subgraph Edge["Edge (production)"]
+        NGINX["Nginx<br/>static assets + /api proxy"]
+    end
+
+    subgraph Backend["FastAPI backend"]
+        direction TB
+        ROUTERS["api/ routers<br/>(HTTP only)"]
+        SERVICES["services/<br/>(business rules + authz)"]
+        REPOS["repositories/<br/>(all SQL)"]
+        MODELS["models/<br/>(SQLAlchemy 2.0)"]
+        ROUTERS --> SERVICES --> REPOS --> MODELS
+    end
+
+    DB[("PostgreSQL")]
+    FILES[["Local file storage<br/>(off web root)"]]
+
+    SPA -->|HTTPS / JSON| NGINX
+    NGINX -->|/api/v1| ROUTERS
+    NGINX -->|static| SPA
+    MODELS --> DB
+    SERVICES --> FILES

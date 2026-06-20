@@ -1,0 +1,17 @@
+sequenceDiagram
+    autonumber
+    participant B as Browser (SPA)
+    participant A as FastAPI (auth)
+    participant DB as PostgreSQL
+
+    B->>A: POST /api/v1/auth/login {email, password}
+    A->>DB: SELECT user WHERE lower(email) = ?
+    DB-->>A: user row (or none)
+    A->>A: bcrypt.verify(password, hash)
+    alt valid credentials
+        A->>A: issue signed JWT (sub, iat, exp)
+        A-->>B: 200 {user, token}
+        B->>B: store token; attach as Bearer on requests
+    else invalid
+        A-->>B: 401 {error: "Invalid email or password"}
+    end
