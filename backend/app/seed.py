@@ -35,7 +35,8 @@ from app.repositories.user import UserRepository
 logger = get_logger("app.seed")
 
 DEMO_EMAIL = "demo@careerflow.app"
-DEMO_PASSWORD = "DemoPass123!"
+# Intentional, publicly-documented demo credential — not a real secret.
+DEMO_PASSWORD = "DemoPass123!"  # nosec B105
 
 _COMPANIES = [
     ("Stripe", "Fintech", "https://stripe.com", "Remote (US)"),
