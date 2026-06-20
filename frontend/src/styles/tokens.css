@@ -1,0 +1,104 @@
+/*
+ * Design tokens for CareerFlow.
+ * Colours, spacing, radii, shadows, and typography live here as CSS custom
+ * properties so the whole UI themes from a single source and dark mode is a
+ * token swap rather than per-component logic.
+ */
+
+:root {
+  /* Brand & accent */
+  --brand-50: #eef2ff;
+  --brand-100: #e0e7ff;
+  --brand-200: #c7d2fe;
+  --brand-400: #818cf8;
+  --brand-500: #6366f1;
+  --brand-600: #4f46e5;
+  --brand-700: #4338ca;
+
+  /* Status palette (used by badges and charts) */
+  --status-wishlist: #64748b;
+  --status-applied: #0ea5e9;
+  --status-assessment: #8b5cf6;
+  --status-interview: #f59e0b;
+  --status-final_interview: #d97706;
+  --status-offer: #10b981;
+  --status-rejected: #ef4444;
+  --status-accepted: #059669;
+
+  --priority-low: #64748b;
+  --priority-medium: #f59e0b;
+  --priority-high: #ef4444;
+
+  /* Semantic surfaces (light theme defaults) */
+  --bg: #f6f7fb;
+  --bg-elevated: #ffffff;
+  --bg-sidebar: #0f172a;
+  --bg-sunken: #eef1f7;
+  --surface-hover: #f1f5f9;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+  --text-on-brand: #ffffff;
+  --sidebar-text: #cbd5e1;
+  --sidebar-text-active: #ffffff;
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --danger-bg: #fef2f2;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.14);
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+
+  /* Typography */
+  --font-sans:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+
+  --sidebar-width: 256px;
+  --topbar-height: 64px;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0b1120;
+  --bg-elevated: #131c30;
+  --bg-sidebar: #0a0f1d;
+  --bg-sunken: #0e1626;
+  --surface-hover: #1c2740;
+  --border: #1e293b;
+  --border-strong: #334155;
+
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+  --sidebar-text: #94a3b8;
+  --sidebar-text-active: #ffffff;
+
+  --danger-bg: #2a1414;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
