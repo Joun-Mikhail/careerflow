@@ -223,9 +223,7 @@ function InterviewsSection({ applicationId }: { applicationId: string }) {
                     </div>
                   </div>
                   <div className="row" style={{ gap: 'var(--space-2)' }}>
-                    <span className={`badge badge--${iv.result === 'passed' ? 'offer' : iv.result === 'failed' ? 'rejected' : 'applied'}`}>
-                      {iv.result}
-                    </span>
+                    <span className={`badge badge--${iv.result}`}>{iv.result}</span>
                     <button
                       className="btn-icon btn-ghost"
                       aria-label="Delete interview"

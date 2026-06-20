@@ -500,6 +500,24 @@ h4 {
   background: color-mix(in srgb, var(--priority-high) 16%, transparent);
 }
 
+/* Interview results */
+.badge--pending {
+  color: var(--status-applied);
+  background: color-mix(in srgb, var(--status-applied) 14%, transparent);
+}
+.badge--passed {
+  color: var(--status-offer);
+  background: color-mix(in srgb, var(--status-offer) 16%, transparent);
+}
+.badge--failed {
+  color: var(--status-rejected);
+  background: color-mix(in srgb, var(--status-rejected) 14%, transparent);
+}
+.badge--cancelled {
+  color: var(--status-wishlist);
+  background: color-mix(in srgb, var(--status-wishlist) 14%, transparent);
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
