@@ -6,7 +6,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.core.errors import NotFoundError
+from app.core.errors import ensure_found
 from app.models.note import Note
 from app.models.user import User
 from app.repositories.application import ApplicationRepository
@@ -31,10 +31,7 @@ class NoteService:
         return self.repo.add(note)
 
     def get(self, owner: User, note_id: UUID) -> Note:
-        note = self.repo.get(owner.id, note_id)
-        if note is None:
-            raise NotFoundError("Note not found.")
-        return note
+        return ensure_found(self.repo.get(owner.id, note_id), "Note not found.")
 
     def update(self, owner: User, note_id: UUID, data: NoteUpdate) -> Note:
         note = self.get(owner, note_id)
@@ -47,5 +44,4 @@ class NoteService:
         self.repo.delete(note)
 
     def _ensure_application_owned(self, owner: User, application_id: UUID) -> None:
-        if self.applications.get(owner.id, application_id) is None:
-            raise NotFoundError("Application not found.")
+        ensure_found(self.applications.get(owner.id, application_id), "Application not found.")

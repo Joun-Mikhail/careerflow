@@ -6,7 +6,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.core.errors import NotFoundError
+from app.core.errors import ensure_found
 from app.models.interview import Interview
 from app.models.user import User
 from app.repositories.application import ApplicationRepository
@@ -31,10 +31,7 @@ class InterviewService:
         return self.repo.add(interview)
 
     def get(self, owner: User, interview_id: UUID) -> Interview:
-        interview = self.repo.get(owner.id, interview_id)
-        if interview is None:
-            raise NotFoundError("Interview not found.")
-        return interview
+        return ensure_found(self.repo.get(owner.id, interview_id), "Interview not found.")
 
     def update(self, owner: User, interview_id: UUID, data: InterviewUpdate) -> Interview:
         interview = self.get(owner, interview_id)
@@ -48,5 +45,4 @@ class InterviewService:
         self.repo.delete(interview)
 
     def _ensure_application_owned(self, owner: User, application_id: UUID) -> None:
-        if self.applications.get(owner.id, application_id) is None:
-            raise NotFoundError("Application not found.")
+        ensure_found(self.applications.get(owner.id, application_id), "Application not found.")

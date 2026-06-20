@@ -6,7 +6,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.core.errors import NotFoundError
+from app.core.errors import ensure_found
 from app.core.pagination import Page, PageParams
 from app.models.base import utcnow
 from app.models.enums import TaskPriority
@@ -30,10 +30,7 @@ class TaskService:
         return self.repo.add(task)
 
     def get(self, owner: User, task_id: UUID) -> Task:
-        task = self.repo.get(owner.id, task_id)
-        if task is None:
-            raise NotFoundError("Task not found.")
-        return task
+        return ensure_found(self.repo.get(owner.id, task_id), "Task not found.")
 
     def list(
         self,
@@ -88,5 +85,4 @@ class TaskService:
     def _ensure_application_owned(self, owner: User, application_id: UUID | None) -> None:
         if application_id is None:
             return
-        if self.applications.get(owner.id, application_id) is None:
-            raise NotFoundError("Application not found.")
+        ensure_found(self.applications.get(owner.id, application_id), "Application not found.")

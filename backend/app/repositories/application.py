@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import asc, desc
-
 from app.core.pagination import PageParams
 from app.models.application import Application
 from app.models.enums import ApplicationStatus
@@ -43,8 +41,7 @@ class ApplicationRepository(BaseRepository[Application]):
         if company_id is not None:
             stmt = stmt.where(Application.company_id == company_id)
 
-        column = SORTABLE_FIELDS.get(sort, Application.created_at)
-        direction = asc if order == "asc" else desc
-        # Sorting by a nullable column keeps NULLs last regardless of direction.
-        stmt = stmt.order_by(direction(column), desc(Application.id))
+        stmt = self.apply_sort(
+            stmt, sortable=SORTABLE_FIELDS, sort=sort, order=order, default=Application.created_at
+        )
         return self.paginate(stmt, params=params)

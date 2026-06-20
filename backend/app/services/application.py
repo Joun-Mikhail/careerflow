@@ -6,7 +6,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.core.errors import NotFoundError
+from app.core.errors import ensure_found
 from app.core.pagination import Page, PageParams
 from app.models.application import Application
 from app.models.enums import ApplicationStatus
@@ -29,10 +29,7 @@ class ApplicationService:
         return self.repo.add(application)
 
     def get(self, owner: User, application_id: UUID) -> Application:
-        application = self.repo.get(owner.id, application_id)
-        if application is None:
-            raise NotFoundError("Application not found.")
-        return application
+        return ensure_found(self.repo.get(owner.id, application_id), "Application not found.")
 
     def list(
         self,
@@ -78,5 +75,4 @@ class ApplicationService:
         """Validate that a referenced company exists and belongs to the user."""
         if company_id is None:
             return
-        if self.companies.get(owner.id, company_id) is None:
-            raise NotFoundError("Company not found.")
+        ensure_found(self.companies.get(owner.id, company_id), "Company not found.")

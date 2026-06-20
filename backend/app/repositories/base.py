@@ -8,11 +8,13 @@ avoids duplicating query plumbing across every entity.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Generic, TypeVar
 from uuid import UUID
 
-from sqlalchemy import ColumnElement, Select, func, select
+from sqlalchemy import ColumnElement, Select, asc, desc, func, select
 from sqlalchemy.orm import InstrumentedAttribute, Session
+from sqlalchemy.sql import ColumnExpressionArgument
 
 from app.core.database import Base
 from app.core.pagination import PageParams
@@ -81,3 +83,21 @@ class BaseRepository(Generic[ModelT]):
     def ilike_contains(column: InstrumentedAttribute[str], term: str) -> ColumnElement[bool]:
         """Case-insensitive ``contains`` predicate for search inputs."""
         return column.ilike(f"%{term}%")
+
+    def apply_sort(
+        self,
+        stmt: Select[tuple[ModelT]],
+        *,
+        sortable: Mapping[str, ColumnExpressionArgument[object]],
+        sort: str,
+        order: str,
+        default: ColumnExpressionArgument[object],
+    ) -> Select[tuple[ModelT]]:
+        """Order ``stmt`` by an allow-listed field with a stable id tiebreaker.
+
+        Unknown sort keys fall back to ``default``; a descending id tiebreaker
+        keeps pagination deterministic when the primary sort key has ties.
+        """
+        column = sortable.get(sort, default)
+        direction = asc if order == "asc" else desc
+        return stmt.order_by(direction(column), desc(self.model.id))  # type: ignore[attr-defined]

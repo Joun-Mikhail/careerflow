@@ -7,7 +7,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
-from app.core.errors import NotFoundError, ValidationError
+from app.core.errors import NotFoundError, ValidationError, ensure_found
 from app.core.storage import LocalFileStorage
 from app.models.attachment import Attachment
 from app.models.enums import AttachmentKind
@@ -63,10 +63,7 @@ class AttachmentService:
         return self.repo.add(attachment)
 
     def get(self, owner: User, attachment_id: UUID) -> Attachment:
-        attachment = self.repo.get(owner.id, attachment_id)
-        if attachment is None:
-            raise NotFoundError("Attachment not found.")
-        return attachment
+        return ensure_found(self.repo.get(owner.id, attachment_id), "Attachment not found.")
 
     def read_bytes(self, owner: User, attachment_id: UUID) -> tuple[Attachment, bytes]:
         attachment = self.get(owner, attachment_id)
@@ -94,5 +91,4 @@ class AttachmentService:
             )
 
     def _ensure_application_owned(self, owner: User, application_id: UUID) -> None:
-        if self.applications.get(owner.id, application_id) is None:
-            raise NotFoundError("Application not found.")
+        ensure_found(self.applications.get(owner.id, application_id), "Application not found.")

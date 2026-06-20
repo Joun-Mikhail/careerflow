@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import asc, desc
-
 from app.core.pagination import PageParams
 from app.models.company import Company
 from app.repositories.base import BaseRepository
@@ -40,7 +38,7 @@ class CompanyRepository(BaseRepository[Company]):
         if industry:
             stmt = stmt.where(Company.industry == industry)
 
-        column = SORTABLE_FIELDS.get(sort, Company.created_at)
-        direction = asc if order == "asc" else desc
-        stmt = stmt.order_by(direction(column), desc(Company.id))
+        stmt = self.apply_sort(
+            stmt, sortable=SORTABLE_FIELDS, sort=sort, order=order, default=Company.created_at
+        )
         return self.paginate(stmt, params=params)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import asc, case, desc
+from sqlalchemy import case
 
 from app.core.pagination import PageParams
 from app.models.enums import TaskPriority
@@ -46,7 +46,7 @@ class TaskRepository(BaseRepository[Task]):
         if priority is not None:
             stmt = stmt.where(Task.priority == priority)
 
-        column = SORTABLE_FIELDS.get(sort, Task.created_at)
-        direction = asc if order == "asc" else desc
-        stmt = stmt.order_by(direction(column), desc(Task.id))
+        stmt = self.apply_sort(
+            stmt, sortable=SORTABLE_FIELDS, sort=sort, order=order, default=Task.created_at
+        )
         return self.paginate(stmt, params=params)

@@ -7,7 +7,9 @@ them into the consistent error envelope documented in ``docs/04-api-design.md``.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypeVar
+
+T = TypeVar("T")
 
 
 class DomainError(Exception):
@@ -52,3 +54,14 @@ class ValidationError(DomainError):
 class AuthenticationError(DomainError):
     code = "unauthorized"
     status_code = 401
+
+
+def ensure_found(value: T | None, message: str) -> T:
+    """Return ``value`` if present, otherwise raise :class:`NotFoundError`.
+
+    Centralizes the "look up an owned entity or 404" pattern used throughout the
+    service layer so each service method stays a single expressive line.
+    """
+    if value is None:
+        raise NotFoundError(message)
+    return value

@@ -35,10 +35,6 @@ class StatsRepository:
             .where(Application.deleted_at.is_(None))
         )
 
-    def count_applications(self, owner_id: UUID) -> int:
-        stmt = select(func.count()).select_from(self._active_applications(owner_id).subquery())
-        return int(self.session.execute(stmt).scalar_one())
-
     def status_distribution(self, owner_id: UUID) -> dict[ApplicationStatus, int]:
         stmt = (
             select(Application.status, func.count())

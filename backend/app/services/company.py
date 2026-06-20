@@ -6,7 +6,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.core.errors import NotFoundError
+from app.core.errors import ensure_found
 from app.core.pagination import Page, PageParams
 from app.models.company import Company
 from app.models.user import User
@@ -25,10 +25,7 @@ class CompanyService:
         return self.repo.add(company)
 
     def get(self, owner: User, company_id: UUID) -> Company:
-        company = self.repo.get(owner.id, company_id)
-        if company is None:
-            raise NotFoundError("Company not found.")
-        return company
+        return ensure_found(self.repo.get(owner.id, company_id), "Company not found.")
 
     def list(
         self,
