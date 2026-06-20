@@ -99,7 +99,7 @@ All errors share one shape, produced by the central exception handler:
 | --- | --- | --- |
 | `GET` | `/applications` | List; `q` on role; filters `status`, `company_id`; sort `created_at\|applied_at\|updated_at` |
 | `POST` | `/applications` | Create |
-| `GET` | `/applications/{id}` | Retrieve (includes counts of interviews/notes) |
+| `GET` | `/applications/{id}` | Retrieve a single application |
 | `PATCH` | `/applications/{id}` | Partial update (incl. status transition) |
 | `DELETE` | `/applications/{id}` | Soft delete (204) |
 

@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 
 PDF_BYTES = b"%PDF-1.4 fake pdf content for testing"
 PDF_TYPE = "application/pdf"
-DOCX_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
 
 def _create_application(client: TestClient, headers: dict[str, str]) -> str:
