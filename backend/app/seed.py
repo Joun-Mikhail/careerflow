@@ -45,9 +45,16 @@ _COMPANIES = [
     ("Notion", "Productivity", "https://notion.so", "San Francisco, CA"),
     ("Vercel", "Cloud Platform", "https://vercel.com", "Remote"),
     ("Figma", "Design", "https://figma.com", "San Francisco, CA"),
+    ("Cloudflare", "Security", "https://cloudflare.com", "Austin, TX"),
+    ("Ramp", "Fintech", "https://ramp.com", "New York, NY"),
+    ("Airbnb", "Travel", "https://airbnb.com", "Remote (US)"),
+    ("Sentry", "Developer Tools", "https://sentry.io", "Remote"),
 ]
 
-# (company_index, role, status, salary_min, salary_max, remote, source, days_ago_applied)
+
+# A realistic, in-progress search: a wider funnel at the top (applied/wishlist),
+# a few advancing, a couple of offers, and the rejections that come with volume.
+# Columns: company_index, role, status, salary_min, salary_max, remote, source, days_ago.
 _APPLICATIONS = [
     (
         0,
@@ -69,12 +76,56 @@ _APPLICATIONS = [
         "LinkedIn",
         28,
     ),
-    (2, "Full-Stack Engineer", ApplicationStatus.OFFER, 140000, 175000, True, "Company site", 35),
-    (3, "Backend Engineer", ApplicationStatus.ASSESSMENT, 135000, 170000, False, "LinkedIn", 10),
+    (2, "Full-Stack Engineer", ApplicationStatus.OFFER, 140000, 175000, True, "Company site", 34),
+    (3, "Backend Engineer", ApplicationStatus.ASSESSMENT, 135000, 170000, False, "LinkedIn", 9),
     (4, "Senior Software Engineer", ApplicationStatus.APPLIED, 155000, 195000, True, "Referral", 5),
-    (5, "Product Engineer", ApplicationStatus.REJECTED, 145000, 180000, False, "Recruiter", 40),
+    (5, "Product Engineer", ApplicationStatus.REJECTED, 145000, 180000, False, "Recruiter", 62),
+    (6, "Systems Engineer", ApplicationStatus.ASSESSMENT, 140000, 180000, True, "Company site", 16),
+    (
+        7,
+        "Software Engineer, Payments",
+        ApplicationStatus.INTERVIEW,
+        150000,
+        185000,
+        False,
+        "Referral",
+        44,
+    ),
+    (8, "Backend Engineer II", ApplicationStatus.APPLIED, 150000, 190000, True, "LinkedIn", 12),
+    (9, "Full-Stack Engineer", ApplicationStatus.APPLIED, 140000, 175000, True, "Company site", 7),
     (0, "Staff Engineer", ApplicationStatus.WISHLIST, None, None, True, "Company site", 0),
-    (2, "Engineering Manager", ApplicationStatus.ACCEPTED, 180000, 220000, True, "Referral", 50),
+    (
+        7,
+        "Senior Backend Engineer",
+        ApplicationStatus.WISHLIST,
+        None,
+        None,
+        False,
+        "Company site",
+        0,
+    ),
+    (2, "Engineering Manager", ApplicationStatus.ACCEPTED, 180000, 220000, True, "Referral", 95),
+    (
+        3,
+        "Senior Frontend Engineer",
+        ApplicationStatus.REJECTED,
+        145000,
+        180000,
+        False,
+        "LinkedIn",
+        138,
+    ),
+    (5, "Design Engineer", ApplicationStatus.REJECTED, 140000, 175000, True, "Recruiter", 205),
+    (
+        1,
+        "Site Reliability Engineer",
+        ApplicationStatus.APPLIED,
+        145000,
+        180000,
+        True,
+        "LinkedIn",
+        252,
+    ),
 ]
 
 
@@ -168,6 +219,26 @@ def _seed_interviews(session: Session, user: User, applications: list[Applicatio
             mode=InterviewMode.VIDEO,
             result=InterviewResult.PASSED,
             notes="Went well — offer received the following week.",
+        ),
+        Interview(
+            user_id=user.id,
+            application_id=applications[7].id,
+            scheduled_at=now + timedelta(days=3, hours=2),
+            round_type="Hiring manager",
+            interviewer="Daniel Okafor",
+            mode=InterviewMode.VIDEO,
+            result=InterviewResult.PENDING,
+            notes="Discuss payments domain experience and team fit.",
+        ),
+        Interview(
+            user_id=user.id,
+            application_id=applications[12].id,
+            scheduled_at=now - timedelta(days=30),
+            round_type="Final panel",
+            interviewer="Sofia Almeida",
+            mode=InterviewMode.ONSITE,
+            result=InterviewResult.PASSED,
+            notes="Accepted the offer — start date confirmed.",
         ),
     ]
     session.add_all(interviews)
