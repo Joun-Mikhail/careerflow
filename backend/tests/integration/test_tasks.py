@@ -69,6 +69,20 @@ def test_sort_by_priority_descending_is_semantic(
     assert priorities == ["high", "medium", "low"]
 
 
+def test_uncomplete_via_patch_clears_completed_at(
+    client: TestClient, auth_headers: dict[str, str]
+) -> None:
+    task = _create_task(client, auth_headers)
+    client.post(f"/api/v1/tasks/{task['id']}/complete", headers=auth_headers)
+    response = client.patch(
+        f"/api/v1/tasks/{task['id']}", json={"is_completed": False}, headers=auth_headers
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["is_completed"] is False
+    assert body["completed_at"] is None
+
+
 def test_create_with_unowned_application_returns_404(
     client: TestClient, auth_headers: dict[str, str]
 ) -> None:
