@@ -1,0 +1,55 @@
+# CareerFlow — full stack for local development and demos.
+# Usage:  docker compose up --build   →  http://localhost:5173
+#
+# Values default to development-friendly settings and can be overridden via a
+# root .env file (see .env.example). Do not use these defaults in production.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-careerflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-careerflow}
+      POSTGRES_DB: ${POSTGRES_DB:-careerflow}
+    volumes:
+      - careerflow_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-careerflow}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      CAREERFLOW_ENV: ${CAREERFLOW_ENV:-local}
+      DEBUG: ${DEBUG:-true}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-careerflow}:${POSTGRES_PASSWORD:-careerflow}@db:5432/${POSTGRES_DB:-careerflow}
+      JWT_SECRET: ${JWT_SECRET:-dev-only-change-me-32-bytes-minimum-secret}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+    volumes:
+      - careerflow_uploads:/app/var/uploads
+    healthcheck:
+      test:
+        ['CMD', 'python', '-c', "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - '${FRONTEND_PORT:-5173}:80'
+    restart: unless-stopped
+
+volumes:
+  careerflow_pgdata:
+  careerflow_uploads:
