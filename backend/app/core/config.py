@@ -9,10 +9,10 @@ so the values are parsed and validated exactly once.
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 Environment = Literal["local", "production", "test"]
 
@@ -52,7 +52,9 @@ class Settings(BaseSettings):
     bcrypt_rounds: int = Field(default=12, ge=4, le=18, alias="BCRYPT_ROUNDS")
 
     # --- CORS --------------------------------------------------------------
-    cors_origins: list[str] = Field(
+    # ``NoDecode`` stops pydantic-settings from JSON-decoding the env value so
+    # the validator below can accept a plain comma-separated string.
+    cors_origins: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["http://localhost:5173"], alias="CORS_ORIGINS"
     )
 

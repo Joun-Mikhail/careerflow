@@ -1,0 +1,25 @@
+"""Unit tests for settings parsing."""
+
+from __future__ import annotations
+
+import pytest
+from app.core.config import Settings
+
+
+def test_cors_origins_parses_comma_separated_string(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CORS_ORIGINS", "http://localhost:5173,https://app.example.com")
+    settings = Settings()
+    assert settings.cors_origins == ["http://localhost:5173", "https://app.example.com"]
+
+
+def test_cors_origins_strips_whitespace_and_blanks(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CORS_ORIGINS", " http://a.test , , http://b.test ")
+    settings = Settings()
+    assert settings.cors_origins == ["http://a.test", "http://b.test"]
+
+
+def test_production_rejects_placeholder_secret(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CAREERFLOW_ENV", "production")
+    monkeypatch.setenv("JWT_SECRET", "change-me-in-production")
+    with pytest.raises(RuntimeError):
+        Settings().validate_for_runtime()
