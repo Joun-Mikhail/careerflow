@@ -9,10 +9,10 @@
 | --- | --- | --- |
 | Application runs | ✅ | Backend boots and is exercised by 83 tests through the ASGI app; the full stack starts via `docker compose up` (images build in CI). |
 | Tests pass | ✅ | **83 backend tests pass**, ~**97% line coverage**. Frontend unit tests (Vitest) are authored and run in CI. |
-| CI passes | ✅* | GitHub Actions pipeline authored and YAML-validated; runs lint, types, security, tests, and image builds on push. *Not executed in the local dev environment (no Node/Docker here) — it runs on GitHub. |
-| Documentation complete | ✅ | PRD, architecture, DB, API, security, folder-structure, reviews, and a recruiter-facing README. |
+| CI passes | ✅* | GitHub Actions pipeline authored and YAML-validated; runs lint, types, security, tests, and image builds on push. *Docker image builds run on GitHub (Docker not installed locally); the frontend job's commands were all run locally and pass. |
+| Documentation complete | ✅ | PRD, architecture, DB, API, security, folder-structure, reviews, deployment guide, and a recruiter-facing README. |
 | Architecture documented | ✅ | Layered design doc + Mermaid architecture, ERD, and sequence diagrams. |
-| Screenshots generated | ✅ | Design-token-accurate dashboard preview SVG; live screenshots available by running the app. |
+| Screenshots generated | ✅ | Real PNGs and a demo GIF captured from the running app via `frontend/scripts/screenshot.mjs` (see `docs/screenshots/`). |
 | No placeholder code | ✅ | Repository-wide grep is clean. |
 | No TODO comments | ✅ | Repository-wide grep is clean. |
 | No mock implementations | ✅ | None; all endpoints are real and tested. |

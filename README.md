@@ -13,9 +13,9 @@ from wishlist to offer, in one professional workspace.
 [![Coverage](https://img.shields.io/badge/backend_coverage-97%25-brightgreen)](backend/)
 [![License](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 
-<img src="docs/diagrams/dashboard-preview.svg" alt="CareerFlow dashboard preview" width="820" />
+<img src="docs/screenshots/dashboard.png" alt="CareerFlow dashboard" width="860" />
 
-<sub>Dashboard UI preview rendered from the application's own design tokens. Run <code>docker compose up</code> for the live app.</sub>
+<sub>The dashboard, captured from the running application with seeded demo data.</sub>
 
 </div>
 
@@ -63,6 +63,20 @@ reminders, and analytics on what's converting.
 - 📎 **Attachments** — secure resume/cover-letter uploads (validated, owner-only download).
 - 📊 **Dashboard & analytics** — headline stats, upcoming interviews, pending tasks, and Recharts visualizations (applications over time, status & industry distribution, conversion rates).
 - 🌗 **Polished UX** — responsive layout, light/dark themes, and proper loading / empty / error states throughout.
+
+## Screenshots
+
+> Captured from the running app (`frontend/scripts/screenshot.mjs`) against the seeded demo data.
+
+<p align="center">
+  <img src="docs/screenshots/demo.gif" alt="CareerFlow walkthrough: dashboard, pipeline board, application detail, tasks, analytics" width="780" />
+</p>
+
+| Pipeline board | Application detail |
+| --- | --- |
+| <img src="docs/screenshots/applications-board.png" alt="Kanban pipeline board" /> | <img src="docs/screenshots/application-detail.png" alt="Application detail with interviews, notes, attachments" /> |
+| **Analytics** | **Light theme** |
+| <img src="docs/screenshots/analytics.png" alt="Analytics charts" /> | <img src="docs/screenshots/dashboard-light.png" alt="Dashboard in light mode" /> |
 
 ## Tech stack
 
