@@ -322,6 +322,8 @@ placeholder secret.
 | [Database Design](docs/03-database-design.md) | Tables, indexes, soft-delete & referential rules |
 | [API Design](docs/04-api-design.md) | Endpoints, pagination, error format, examples |
 | [Security Design](docs/05-security-design.md) / [Security Review](docs/security-review.md) | Threat model, controls, audit findings |
+| [Deployment Guide](docs/deployment.md) | Hosting the frontend, backend, and database |
+| [Runtime Verification](docs/verification.md) | Evidence from actual builds and runs |
 | [Folder Structure](docs/06-folder-structure.md) | Repository layout and conventions |
 | [Backend Review](docs/backend-architecture-review.md) / [Repository Audit](docs/repository-audit.md) | Self-reviews and refactors |
 
