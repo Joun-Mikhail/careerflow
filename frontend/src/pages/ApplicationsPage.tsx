@@ -32,13 +32,13 @@ export function ApplicationsPage() {
   const { data: companyData } = useCompanies({ page_size: 100, sort: 'name', order: 'asc' });
   const createApplication = useCreateApplication();
 
-  const companies = companyData?.items ?? [];
+  const companies = useMemo(() => companyData?.items ?? [], [companyData]);
   const companyName = useMemo(() => {
     const map = new Map(companies.map((c) => [c.id, c.name]));
     return (id: string | null) => (id ? (map.get(id) ?? 'Unknown company') : 'No company');
   }, [companies]);
 
-  const applications = data?.items ?? [];
+  const applications = useMemo(() => data?.items ?? [], [data]);
   const byStatus = useMemo(() => {
     const groups = new Map<ApplicationStatus, Application[]>();
     for (const status of PIPELINE_STATUSES) groups.set(status, []);

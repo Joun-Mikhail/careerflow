@@ -41,8 +41,9 @@ frontend/coverage/
 *.key
 
 # ---------------------------------------------------------------------------
-# Editors / OS
+# Editors / OS / local tooling
 # ---------------------------------------------------------------------------
+.claude/
 .idea/
 .vscode/*
 !.vscode/extensions.json
