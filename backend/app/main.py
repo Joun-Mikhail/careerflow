@@ -52,7 +52,11 @@ def _configure_middleware(app: FastAPI) -> None:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
-        allow_credentials=True,
+        # Auth uses a Bearer token in the Authorization header, not cookies, so
+        # credentials are disabled. This keeps cross-origin requests (e.g. the
+        # SPA on Vercel calling the API on Railway) spec-compliant — wildcard
+        # allowed headers are invalid when credentials are enabled.
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )
@@ -65,6 +69,11 @@ def _configure_middleware(app: FastAPI) -> None:
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "no-referrer")
+        # Enforce HTTPS in production (ignored by browsers over plain HTTP).
+        if settings.is_production:
+            response.headers.setdefault(
+                "Strict-Transport-Security", "max-age=31536000; includeSubDomains"
+            )
         return response
 
 
