@@ -78,6 +78,24 @@ async function main() {
     await page.waitForSelector('svg.recharts-surface', { timeout: 15000 });
     await wait(1200);
     await shot('analytics');
+
+    // 5. Interviews (global list).
+    await page.goto(`${BASE_URL}/interviews`, { waitUntil: 'load' });
+    await page.waitForSelector('.page-title');
+    await wait(700);
+    await shot('interviews');
+
+    // 6. Offers.
+    await page.goto(`${BASE_URL}/offers`, { waitUntil: 'load' });
+    await page.waitForSelector('.page-title');
+    await wait(700);
+    await shot('offers');
+
+    // 7. Settings.
+    await page.goto(`${BASE_URL}/settings`, { waitUntil: 'load' });
+    await page.waitForSelector('.page-title');
+    await wait(700);
+    await shot('settings');
   } finally {
     await browser.close();
   }

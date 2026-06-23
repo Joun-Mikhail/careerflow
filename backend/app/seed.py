@@ -24,10 +24,12 @@ from app.models.enums import (
     ApplicationStatus,
     InterviewMode,
     InterviewResult,
+    OfferDecision,
     TaskPriority,
 )
 from app.models.interview import Interview
 from app.models.note import Note
+from app.models.offer import Offer
 from app.models.task import Task
 from app.models.user import User
 from app.repositories.user import UserRepository
@@ -181,10 +183,40 @@ def seed_demo_data(session: Session) -> bool:
     _seed_interviews(session, user, applications)
     _seed_tasks(session, user, applications)
     _seed_notes(session, user, applications)
+    _seed_offers(session, user, applications)
 
     session.commit()
     logger.info("seeded demo data for %s", DEMO_EMAIL)
     return True
+
+
+def _seed_offers(session: Session, user: User, applications: list[Application]) -> None:
+    """Create offers for any applications that reached an offer/accepted stage."""
+    now = utcnow()
+    offer_specs = {
+        ApplicationStatus.OFFER: (OfferDecision.NEGOTIATING, 165000, 25000, "0.1% equity"),
+        ApplicationStatus.ACCEPTED: (OfferDecision.ACCEPTED, 185000, 30000, "0.15% equity"),
+    }
+    offers = []
+    for application in applications:
+        spec = offer_specs.get(application.status)
+        if spec is None:
+            continue
+        decision, base, bonus, equity = spec
+        offers.append(
+            Offer(
+                user_id=user.id,
+                application_id=application.id,
+                base_salary=base,
+                bonus=bonus,
+                equity=equity,
+                currency="USD",
+                benefits="Health, dental, 401(k) match, 4 weeks PTO, remote stipend.",
+                decision=decision,
+                received_at=now - timedelta(days=5),
+            )
+        )
+    session.add_all(offers)
 
 
 def _seed_interviews(session: Session, user: User, applications: list[Application]) -> None:

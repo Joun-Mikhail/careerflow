@@ -54,15 +54,17 @@ reminders, and analytics on what's converting.
 
 ## Features
 
-- 🔐 **Secure auth** — email/password registration, bcrypt hashing, JWT sessions, fully user-scoped data.
+- 🔐 **Secure auth** — email/password registration, bcrypt hashing, short-lived JWT access tokens with **refresh-token rotation**, and fully user-scoped data.
 - 🏢 **Companies** — CRUD with search, industry filtering, and pagination.
 - 💼 **Application pipeline** — eight stages (Wishlist → Applied → Assessment → Interview → Final → Offer → Rejected → Accepted), shown as a **Kanban board** or a sortable list, with salary, location, source, and links.
-- 🗓️ **Interviews** — multiple rounds per application with mode, interviewer, result, and notes.
+- 🗓️ **Interviews** — multiple rounds per application plus a dedicated cross-pipeline list filtered by upcoming/past.
+- 💰 **Offers** — track base salary, bonus, equity, benefits, and your decision (pending/negotiating/accepted/declined).
 - ✅ **Tasks** — priorities, due dates, completion, and semantic priority sorting.
 - 📝 **Notes** — Markdown notes per application.
 - 📎 **Attachments** — secure resume/cover-letter uploads (validated, owner-only download).
 - 📊 **Dashboard & analytics** — headline stats, upcoming interviews, pending tasks, and Recharts visualizations (applications over time, status & industry distribution, conversion rates).
-- 🌗 **Polished UX** — responsive layout, light/dark themes, and proper loading / empty / error states throughout.
+- ⚙️ **Settings** — update your profile and change your password.
+- 🌗 **Polished UX** — responsive layout, light/dark themes, Zod-validated forms, and proper loading / empty / error states throughout.
 
 ## Screenshots
 
@@ -75,6 +77,8 @@ reminders, and analytics on what's converting.
 | Pipeline board | Application detail |
 | --- | --- |
 | <img src="docs/screenshots/applications-board.png" alt="Kanban pipeline board" /> | <img src="docs/screenshots/application-detail.png" alt="Application detail with interviews, notes, attachments" /> |
+| **Offers** | **Interviews** |
+| <img src="docs/screenshots/offers.png" alt="Offers with salary, bonus, and decision status" /> | <img src="docs/screenshots/interviews.png" alt="Global interviews list" /> |
 | **Analytics** | **Light theme** |
 | <img src="docs/screenshots/analytics.png" alt="Analytics charts" /> | <img src="docs/screenshots/dashboard-light.png" alt="Dashboard in light mode" /> |
 
