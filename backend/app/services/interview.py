@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy.orm import Session
 
 from app.core.errors import ensure_found
+from app.core.pagination import Page, PageParams
 from app.models.interview import Interview
 from app.models.user import User
 from app.repositories.application import ApplicationRepository
 from app.repositories.interview import InterviewRepository
-from app.schemas.interview import InterviewCreate, InterviewUpdate
+from app.schemas.interview import InterviewCreate, InterviewRead, InterviewUpdate
 
 
 class InterviewService:
@@ -24,6 +26,16 @@ class InterviewService:
     def list_for_application(self, owner: User, application_id: UUID) -> list[Interview]:
         self._ensure_application_owned(owner, application_id)
         return self.repo.list_for_application(owner.id, application_id)
+
+    def list_all(
+        self, owner: User, *, params: PageParams, scope: str = "all"
+    ) -> Page[InterviewRead]:
+        items, total = self.repo.list_interviews(
+            owner.id, params=params, scope=scope, now=datetime.now(UTC)
+        )
+        return Page.create(
+            [InterviewRead.model_validate(item) for item in items], total=total, params=params
+        )
 
     def create(self, owner: User, application_id: UUID, data: InterviewCreate) -> Interview:
         self._ensure_application_owned(owner, application_id)

@@ -2,17 +2,32 @@
 
 from __future__ import annotations
 
+from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Query, status
 
-from app.api.deps import CurrentUser, DbSession
+from app.api.deps import CurrentUser, DbSession, Pagination
+from app.core.pagination import Page
 from app.schemas.interview import InterviewCreate, InterviewRead, InterviewUpdate
 from app.services.interview import InterviewService
 
 # Two routers share the interview service: one nested under an application for
 # listing/creating, one at the top level for addressing a specific interview.
 router = APIRouter(tags=["interviews"])
+
+
+@router.get("/interviews", response_model=Page[InterviewRead], summary="List all interviews")
+def list_all_interviews(
+    current_user: CurrentUser,
+    db: DbSession,
+    pagination: Pagination,
+    scope: Annotated[
+        Literal["all", "upcoming", "past"],
+        Query(description="Filter by schedule relative to now."),
+    ] = "all",
+) -> Page[InterviewRead]:
+    return InterviewService(db).list_all(current_user, params=pagination, scope=scope)
 
 
 @router.get(

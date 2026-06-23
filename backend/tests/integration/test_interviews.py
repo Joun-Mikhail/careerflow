@@ -78,6 +78,35 @@ def test_delete_interview(client: TestClient, auth_headers: dict[str, str]) -> N
     )
 
 
+def test_global_list_and_scope_filters(client: TestClient, auth_headers: dict[str, str]) -> None:
+    app_id = _create_application(client, auth_headers)
+    _create_interview(client, auth_headers, app_id, scheduled_at="2099-01-01T10:00:00Z")
+    _create_interview(client, auth_headers, app_id, scheduled_at="2000-01-01T10:00:00Z")
+
+    all_body = client.get("/api/v1/interviews", headers=auth_headers).json()
+    assert all_body["total"] == 2
+
+    upcoming = client.get("/api/v1/interviews?scope=upcoming", headers=auth_headers).json()
+    assert upcoming["total"] == 1
+    assert upcoming["items"][0]["scheduled_at"].startswith("2099")
+
+    past = client.get("/api/v1/interviews?scope=past", headers=auth_headers).json()
+    assert past["total"] == 1
+    assert past["items"][0]["scheduled_at"].startswith("2000")
+
+
+def test_global_list_scoped_to_owner(client: TestClient, auth_headers: dict[str, str]) -> None:
+    app_id = _create_application(client, auth_headers)
+    _create_interview(client, auth_headers, app_id)
+    other = client.post(
+        "/api/v1/auth/register",
+        json={"email": "iv-other@example.com", "password": "Sup3rSecret!"},
+    ).json()
+    other_headers = {"Authorization": f"Bearer {other['token']['access_token']}"}
+    body = client.get("/api/v1/interviews", headers=other_headers).json()
+    assert body["total"] == 0
+
+
 def test_invalid_mode_rejected(client: TestClient, auth_headers: dict[str, str]) -> None:
     app_id = _create_application(client, auth_headers)
     response = client.post(
