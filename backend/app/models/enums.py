@@ -45,3 +45,12 @@ class AttachmentKind(StrEnum):
     RESUME = "resume"
     COVER_LETTER = "cover_letter"
     OTHER = "other"
+
+
+class OfferDecision(StrEnum):
+    """Where the candidate stands on an offer."""
+
+    PENDING = "pending"
+    NEGOTIATING = "negotiating"
+    ACCEPTED = "accepted"
+    DECLINED = "declined"

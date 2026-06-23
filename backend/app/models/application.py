@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from app.models.company import Company
     from app.models.interview import Interview
     from app.models.note import Note
+    from app.models.offer import Offer
     from app.models.user import User
 
 
@@ -81,6 +82,9 @@ class Application(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
         back_populates="application", cascade="all, delete-orphan"
     )
     attachments: Mapped[list[Attachment]] = relationship(
+        back_populates="application", cascade="all, delete-orphan"
+    )
+    offers: Mapped[list[Offer]] = relationship(
         back_populates="application", cascade="all, delete-orphan"
     )
 

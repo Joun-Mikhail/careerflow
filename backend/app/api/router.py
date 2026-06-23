@@ -17,6 +17,7 @@ from app.api.v1 import (
     dashboard,
     interviews,
     notes,
+    offers,
     tasks,
 )
 
@@ -28,5 +29,6 @@ api_router.include_router(interviews.router)
 api_router.include_router(notes.router)
 api_router.include_router(tasks.router)
 api_router.include_router(attachments.router)
+api_router.include_router(offers.router)
 api_router.include_router(dashboard.router)
 api_router.include_router(analytics.router)

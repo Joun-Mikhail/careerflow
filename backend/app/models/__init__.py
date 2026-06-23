@@ -16,10 +16,12 @@ from app.models.enums import (
     AttachmentKind,
     InterviewMode,
     InterviewResult,
+    OfferDecision,
     TaskPriority,
 )
 from app.models.interview import Interview
 from app.models.note import Note
+from app.models.offer import Offer
 from app.models.task import Task
 from app.models.user import User
 
@@ -33,6 +35,8 @@ __all__ = [
     "InterviewMode",
     "InterviewResult",
     "Note",
+    "Offer",
+    "OfferDecision",
     "Task",
     "TaskPriority",
     "User",
