@@ -12,7 +12,13 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.errors import AuthenticationError, ConflictError
-from app.core.security import create_access_token, hash_password, verify_password
+from app.core.security import (
+    create_access_token,
+    create_refresh_token,
+    decode_refresh_token,
+    hash_password,
+    verify_password,
+)
 from app.models.user import User
 from app.repositories.user import UserRepository
 from app.schemas.user import AuthResponse, Token, UserCreate, UserRead
@@ -66,12 +72,20 @@ class AuthService:
         user.hashed_password = hash_password(new_password)
         self.users.flush()
 
+    def refresh(self, refresh_token: str) -> AuthResponse:
+        """Exchange a valid refresh token for a fresh, rotated token pair."""
+        user_id = decode_refresh_token(refresh_token)
+        user = self.users.get_by_id(user_id)
+        if user is None or not user.is_active:
+            raise AuthenticationError("Could not validate credentials.")
+        return self._auth_response(user)
+
     def _auth_response(self, user: User) -> AuthResponse:
-        token = create_access_token(user.id)
         return AuthResponse(
             user=UserRead.model_validate(user),
             token=Token(
-                access_token=token,
+                access_token=create_access_token(user.id),
+                refresh_token=create_refresh_token(user.id),
                 expires_in=settings.access_token_expire_minutes * 60,
             ),
         )

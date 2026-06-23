@@ -98,6 +98,45 @@ def test_me_rejects_garbage_token(client: TestClient) -> None:
     assert response.status_code == 401
 
 
+def test_login_returns_refresh_token(client: TestClient, registered_user: dict[str, str]) -> None:
+    response = client.post(
+        "/api/v1/auth/login",
+        json={"email": registered_user["email"], "password": registered_user["password"]},
+    )
+    assert response.status_code == 200
+    assert response.json()["token"]["refresh_token"]
+
+
+def test_refresh_returns_new_tokens(client: TestClient, registered_user: dict[str, str]) -> None:
+    login = client.post(
+        "/api/v1/auth/login",
+        json={"email": registered_user["email"], "password": registered_user["password"]},
+    ).json()
+    refresh_token = login["token"]["refresh_token"]
+    response = client.post("/api/v1/auth/refresh", json={"refresh_token": refresh_token})
+    assert response.status_code == 200
+    body = response.json()
+    assert body["token"]["access_token"]
+    assert body["token"]["refresh_token"]
+    # The new access token authorizes a protected route.
+    me = client.get(
+        "/api/v1/auth/me",
+        headers={"Authorization": f"Bearer {body['token']['access_token']}"},
+    )
+    assert me.status_code == 200
+
+
+def test_refresh_rejects_access_token(client: TestClient, registered_user: dict[str, str]) -> None:
+    # Passing an access token where a refresh token is expected must fail.
+    response = client.post("/api/v1/auth/refresh", json={"refresh_token": registered_user["token"]})
+    assert response.status_code == 401
+
+
+def test_refresh_rejects_garbage(client: TestClient) -> None:
+    response = client.post("/api/v1/auth/refresh", json={"refresh_token": "not.a.jwt"})
+    assert response.status_code == 401
+
+
 def test_update_profile(client: TestClient, auth_headers: dict[str, str]) -> None:
     response = client.patch(
         "/api/v1/auth/me", json={"full_name": "Alex Renamed"}, headers=auth_headers

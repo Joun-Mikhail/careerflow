@@ -10,6 +10,7 @@ from app.schemas.user import (
     AuthResponse,
     PasswordChange,
     ProfileUpdate,
+    RefreshRequest,
     UserCreate,
     UserLogin,
     UserRead,
@@ -32,6 +33,11 @@ def register(data: UserCreate, db: DbSession) -> AuthResponse:
 @router.post("/login", response_model=AuthResponse, summary="Authenticate and receive a token")
 def login(data: UserLogin, db: DbSession) -> AuthResponse:
     return AuthService(db).authenticate(data.email, data.password)
+
+
+@router.post("/refresh", response_model=AuthResponse, summary="Rotate tokens via refresh token")
+def refresh(data: RefreshRequest, db: DbSession) -> AuthResponse:
+    return AuthService(db).refresh(data.refresh_token)
 
 
 @router.get("/me", response_model=UserRead, summary="Get the current user's profile")

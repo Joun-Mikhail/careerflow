@@ -46,25 +46,46 @@ def _encode_password(plain_password: str) -> bytes:
     return password_bytes
 
 
-def create_access_token(subject: UUID | str, *, expires_delta: timedelta | None = None) -> str:
-    """Create a signed JWT access token for ``subject`` (the user id)."""
+_TOKEN_TYPE_ACCESS = "access"
+_TOKEN_TYPE_REFRESH = "refresh"
+
+
+def _create_token(subject: UUID | str, *, token_type: str, expires_delta: timedelta) -> str:
     now = datetime.now(UTC)
-    expire = now + (expires_delta or timedelta(minutes=settings.access_token_expire_minutes))
-    payload = {"sub": str(subject), "iat": now, "exp": expire}
+    payload = {
+        "sub": str(subject),
+        "type": token_type,
+        "iat": now,
+        "exp": now + expires_delta,
+    }
     return jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
 
-def decode_access_token(token: str) -> UUID:
-    """Validate ``token`` and return the subject (user id).
+def create_access_token(subject: UUID | str, *, expires_delta: timedelta | None = None) -> str:
+    """Create a signed, short-lived JWT access token for ``subject``."""
+    delta = expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
+    return _create_token(subject, token_type=_TOKEN_TYPE_ACCESS, expires_delta=delta)
 
-    Raises :class:`AuthenticationError` for any invalid, expired, or malformed
-    token so the caller can respond with ``401`` uniformly.
+
+def create_refresh_token(subject: UUID | str, *, expires_delta: timedelta | None = None) -> str:
+    """Create a signed, long-lived JWT refresh token for ``subject``."""
+    delta = expires_delta or timedelta(minutes=settings.refresh_token_expire_minutes)
+    return _create_token(subject, token_type=_TOKEN_TYPE_REFRESH, expires_delta=delta)
+
+
+def _decode_token(token: str, *, expected_type: str) -> UUID:
+    """Validate ``token`` of the expected type and return its subject (user id).
+
+    Raises :class:`AuthenticationError` for any invalid, expired, malformed, or
+    wrong-type token so callers can respond with ``401`` uniformly.
     """
     try:
         payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
     except jwt.PyJWTError as exc:
         raise AuthenticationError("Could not validate credentials.") from exc
 
+    if payload.get("type") != expected_type:
+        raise AuthenticationError("Could not validate credentials.")
     subject = payload.get("sub")
     if not subject:
         raise AuthenticationError("Could not validate credentials.")
@@ -72,3 +93,13 @@ def decode_access_token(token: str) -> UUID:
         return UUID(str(subject))
     except ValueError as exc:
         raise AuthenticationError("Could not validate credentials.") from exc
+
+
+def decode_access_token(token: str) -> UUID:
+    """Validate an access token and return the subject (user id)."""
+    return _decode_token(token, expected_type=_TOKEN_TYPE_ACCESS)
+
+
+def decode_refresh_token(token: str) -> UUID:
+    """Validate a refresh token and return the subject (user id)."""
+    return _decode_token(token, expected_type=_TOKEN_TYPE_REFRESH)

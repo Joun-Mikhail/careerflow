@@ -9,7 +9,9 @@ import pytest
 from app.core.errors import AuthenticationError
 from app.core.security import (
     create_access_token,
+    create_refresh_token,
     decode_access_token,
+    decode_refresh_token,
     hash_password,
     verify_password,
 )
@@ -49,3 +51,21 @@ def test_expired_token_is_rejected() -> None:
 def test_garbage_token_is_rejected() -> None:
     with pytest.raises(AuthenticationError):
         decode_access_token("not.a.jwt")
+
+
+def test_refresh_token_round_trip() -> None:
+    user_id = uuid4()
+    token = create_refresh_token(user_id)
+    assert decode_refresh_token(token) == user_id
+
+
+def test_access_token_is_not_accepted_as_refresh() -> None:
+    token = create_access_token(uuid4())
+    with pytest.raises(AuthenticationError):
+        decode_refresh_token(token)
+
+
+def test_refresh_token_is_not_accepted_as_access() -> None:
+    token = create_refresh_token(uuid4())
+    with pytest.raises(AuthenticationError):
+        decode_access_token(token)

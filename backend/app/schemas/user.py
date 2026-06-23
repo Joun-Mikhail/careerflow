@@ -49,11 +49,18 @@ class PasswordChange(BaseModel):
 
 
 class Token(BaseModel):
-    """Issued access token."""
+    """Issued access + refresh token pair."""
 
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
-    expires_in: int = Field(description="Token lifetime in seconds.")
+    expires_in: int = Field(description="Access-token lifetime in seconds.")
+
+
+class RefreshRequest(BaseModel):
+    """Payload for exchanging a refresh token for a new token pair."""
+
+    refresh_token: str
 
 
 class AuthResponse(BaseModel):
