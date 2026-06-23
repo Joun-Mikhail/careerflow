@@ -46,8 +46,9 @@ def _encode_password(plain_password: str) -> bytes:
     return password_bytes
 
 
-_TOKEN_TYPE_ACCESS = "access"
-_TOKEN_TYPE_REFRESH = "refresh"
+# Token-type discriminators carried in the JWT `type` claim — not secrets.
+_TOKEN_TYPE_ACCESS = "access"  # nosec B105
+_TOKEN_TYPE_REFRESH = "refresh"  # nosec B105
 
 
 def _create_token(subject: UUID | str, *, token_type: str, expires_delta: timedelta) -> str:

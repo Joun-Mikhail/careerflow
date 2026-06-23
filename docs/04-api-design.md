@@ -76,12 +76,28 @@ All errors share one shape, produced by the central exception handler:
 | `POST` | `/auth/register` | Create account → returns user + token | none |
 | `POST` | `/auth/login` | Email+password → access token | none |
 | `GET` | `/auth/me` | Current user profile | required |
+| `PATCH` | `/auth/me` | Update profile (`full_name`) | required |
+| `POST` | `/auth/change-password` | Change password (current + new) | required |
+| `POST` | `/auth/refresh` | Exchange a refresh token for a rotated token pair | none |
 
-`POST /auth/login` accepts `{ "email", "password" }` and returns:
+`POST /auth/login` accepts `{ "email", "password" }` and returns the user plus a
+token pair:
 
 ```json
-{ "access_token": "<jwt>", "token_type": "bearer", "expires_in": 3600 }
+{
+  "user": { "...": "..." },
+  "token": {
+    "access_token": "<jwt>",
+    "refresh_token": "<jwt>",
+    "token_type": "bearer",
+    "expires_in": 3600
+  }
+}
 ```
+
+Access tokens are short-lived; the client exchanges the refresh token at
+`/auth/refresh` to obtain a rotated pair. Tokens carry a `type` claim so an
+access token can never be used to refresh, and vice versa.
 
 ### 4.2 Companies
 
@@ -107,11 +123,23 @@ All errors share one shape, produced by the central exception handler:
 
 | Method | Path | Description |
 | --- | --- | --- |
+| `GET` | `/interviews` | List all interviews (paginated; `scope`=`all\|upcoming\|past`) |
 | `GET` | `/applications/{id}/interviews` | List interviews for an application |
 | `POST` | `/applications/{id}/interviews` | Create interview |
 | `GET` | `/interviews/{id}` | Retrieve |
 | `PATCH` | `/interviews/{id}` | Update (incl. result) |
 | `DELETE` | `/interviews/{id}` | Delete (204) |
+
+### 4.4a Offers
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/offers` | List all offers (paginated; filter `decision`) |
+| `GET` | `/applications/{id}/offers` | List offers for an application |
+| `POST` | `/applications/{id}/offers` | Create offer |
+| `GET` | `/offers/{id}` | Retrieve |
+| `PATCH` | `/offers/{id}` | Update (incl. decision) |
+| `DELETE` | `/offers/{id}` | Delete (204) |
 
 ### 4.5 Notes
 
