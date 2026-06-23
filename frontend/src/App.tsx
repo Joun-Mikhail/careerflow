@@ -9,7 +9,10 @@ import { ApplicationDetailPage } from './pages/ApplicationDetailPage';
 import { ApplicationsPage } from './pages/ApplicationsPage';
 import { CompaniesPage } from './pages/CompaniesPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { InterviewsPage } from './pages/InterviewsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { OffersPage } from './pages/OffersPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { TasksPage } from './pages/TasksPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
@@ -52,9 +55,12 @@ export default function App() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/applications" element={<ApplicationsPage />} />
         <Route path="/applications/:id" element={<ApplicationDetailPage />} />
+        <Route path="/interviews" element={<InterviewsPage />} />
         <Route path="/companies" element={<CompaniesPage />} />
         <Route path="/tasks" element={<TasksPage />} />
+        <Route path="/offers" element={<OffersPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

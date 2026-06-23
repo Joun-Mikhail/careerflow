@@ -1,6 +1,6 @@
 import { api } from './api';
 
-import type { Interview, InterviewMode, InterviewResult } from '@/lib/types';
+import type { Interview, InterviewMode, InterviewResult, Page } from '@/lib/types';
 
 export interface InterviewInput {
   scheduled_at: string;
@@ -11,7 +11,17 @@ export interface InterviewInput {
   notes?: string | null;
 }
 
+export type InterviewScope = 'all' | 'upcoming' | 'past';
+
+export interface InterviewListParams {
+  page?: number;
+  page_size?: number;
+  scope?: InterviewScope;
+}
+
 export const interviewsApi = {
+  list: (params: InterviewListParams = {}) =>
+    api.get<Page<Interview>>('/interviews', { params }).then((r) => r.data),
   listForApplication: (applicationId: string) =>
     api.get<Interview[]>(`/applications/${applicationId}/interviews`).then((r) => r.data),
   create: (applicationId: string, input: InterviewInput) =>

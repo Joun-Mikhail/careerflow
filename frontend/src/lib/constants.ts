@@ -1,6 +1,6 @@
 /** Domain constants shared by forms, filters, and the board. */
 
-import type { ApplicationStatus, InterviewMode, TaskPriority } from './types';
+import type { ApplicationStatus, InterviewMode, OfferDecision, TaskPriority } from './types';
 
 export const APPLICATION_STATUSES: ApplicationStatus[] = [
   'wishlist',
@@ -27,6 +27,21 @@ export const PIPELINE_STATUSES: ApplicationStatus[] = [
 export const TASK_PRIORITIES: TaskPriority[] = ['low', 'medium', 'high'];
 
 export const INTERVIEW_MODES: InterviewMode[] = ['phone', 'video', 'onsite'];
+
+export const OFFER_DECISIONS: OfferDecision[] = [
+  'pending',
+  'negotiating',
+  'accepted',
+  'declined',
+];
+
+/** Hex colours per offer decision, for badges. */
+export const OFFER_DECISION_COLORS: Record<OfferDecision, string> = {
+  pending: '#0ea5e9',
+  negotiating: '#f59e0b',
+  accepted: '#059669',
+  declined: '#ef4444',
+};
 
 export const INTERVIEW_RESULTS = ['pending', 'passed', 'failed', 'cancelled'] as const;
 

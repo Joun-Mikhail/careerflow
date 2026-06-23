@@ -14,6 +14,7 @@ export type InterviewMode = 'phone' | 'video' | 'onsite';
 export type InterviewResult = 'pending' | 'passed' | 'failed' | 'cancelled';
 export type TaskPriority = 'low' | 'medium' | 'high';
 export type AttachmentKind = 'resume' | 'cover_letter' | 'other';
+export type OfferDecision = 'pending' | 'negotiating' | 'accepted' | 'declined';
 
 export interface User {
   id: string;
@@ -26,8 +27,24 @@ export interface User {
 
 export interface Token {
   access_token: string;
+  refresh_token: string;
   token_type: string;
   expires_in: number;
+}
+
+export interface Offer {
+  id: string;
+  application_id: string;
+  base_salary: number | null;
+  bonus: number | null;
+  equity: string | null;
+  currency: string | null;
+  benefits: string | null;
+  decision: OfferDecision;
+  received_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface AuthResponse {

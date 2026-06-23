@@ -28,8 +28,11 @@ export const queryKeys = {
   applications: (params?: unknown) => ['applications', params] as const,
   application: (id: string) => ['applications', id] as const,
   interviews: (applicationId: string) => ['interviews', applicationId] as const,
+  interviewsAll: (params?: unknown) => ['interviews', 'all', params] as const,
   notes: (applicationId: string) => ['notes', applicationId] as const,
   attachments: (applicationId: string) => ['attachments', applicationId] as const,
+  offers: (params?: unknown) => ['offers', params] as const,
+  offersForApplication: (applicationId: string) => ['offers', 'app', applicationId] as const,
   tasks: (params?: unknown) => ['tasks', params] as const,
   analytics: ['analytics'] as const,
 };

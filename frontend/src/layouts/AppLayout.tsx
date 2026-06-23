@@ -4,10 +4,13 @@ import {
   BarChartIcon,
   BriefcaseIcon,
   BuildingIcon,
+  CalendarIcon,
   CheckSquareIcon,
   DashboardIcon,
+  DollarSignIcon,
   LogOutIcon,
   MoonIcon,
+  SettingsIcon,
   SunIcon,
 } from '@/components/icons';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,9 +20,12 @@ import { initials } from '@/lib/format';
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: DashboardIcon, end: true },
   { to: '/applications', label: 'Applications', icon: BriefcaseIcon, end: false },
+  { to: '/interviews', label: 'Interviews', icon: CalendarIcon, end: false },
   { to: '/companies', label: 'Companies', icon: BuildingIcon, end: false },
   { to: '/tasks', label: 'Tasks', icon: CheckSquareIcon, end: false },
+  { to: '/offers', label: 'Offers', icon: DollarSignIcon, end: false },
   { to: '/analytics', label: 'Analytics', icon: BarChartIcon, end: false },
+  { to: '/settings', label: 'Settings', icon: SettingsIcon, end: false },
 ];
 
 export function AppLayout() {
