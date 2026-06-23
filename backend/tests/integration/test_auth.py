@@ -96,3 +96,55 @@ def test_me_returns_profile_with_token(client: TestClient, auth_headers: dict[st
 def test_me_rejects_garbage_token(client: TestClient) -> None:
     response = client.get("/api/v1/auth/me", headers={"Authorization": "Bearer not.a.real.token"})
     assert response.status_code == 401
+
+
+def test_update_profile(client: TestClient, auth_headers: dict[str, str]) -> None:
+    response = client.patch(
+        "/api/v1/auth/me", json={"full_name": "Alex Renamed"}, headers=auth_headers
+    )
+    assert response.status_code == 200
+    assert response.json()["full_name"] == "Alex Renamed"
+
+
+def test_change_password_then_login_with_new(
+    client: TestClient, registered_user: dict[str, str], auth_headers: dict[str, str]
+) -> None:
+    response = client.post(
+        "/api/v1/auth/change-password",
+        json={"current_password": registered_user["password"], "new_password": "BrandNew1!"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 200
+
+    old = client.post(
+        "/api/v1/auth/login",
+        json={"email": registered_user["email"], "password": registered_user["password"]},
+    )
+    assert old.status_code == 401
+    new = client.post(
+        "/api/v1/auth/login",
+        json={"email": registered_user["email"], "password": "BrandNew1!"},
+    )
+    assert new.status_code == 200
+
+
+def test_change_password_rejects_wrong_current(
+    client: TestClient, auth_headers: dict[str, str]
+) -> None:
+    response = client.post(
+        "/api/v1/auth/change-password",
+        json={"current_password": "wrong-one", "new_password": "BrandNew1!"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 401
+
+
+def test_change_password_validates_new_length(
+    client: TestClient, registered_user: dict[str, str], auth_headers: dict[str, str]
+) -> None:
+    response = client.post(
+        "/api/v1/auth/change-password",
+        json={"current_password": registered_user["password"], "new_password": "short"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 422

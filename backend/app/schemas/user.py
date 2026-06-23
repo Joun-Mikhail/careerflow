@@ -35,6 +35,19 @@ class UserRead(IdentifiedModel):
     is_active: bool
 
 
+class ProfileUpdate(BaseModel):
+    """Payload for updating the current user's profile."""
+
+    full_name: str | None = Field(default=None, max_length=120)
+
+
+class PasswordChange(BaseModel):
+    """Payload for changing the current user's password."""
+
+    current_password: str = Field(min_length=1, max_length=PASSWORD_MAX_LENGTH)
+    new_password: str = Field(min_length=PASSWORD_MIN_LENGTH, max_length=PASSWORD_MAX_LENGTH)
+
+
 class Token(BaseModel):
     """Issued access token."""
 

@@ -53,6 +53,19 @@ class AuthService:
             raise AuthenticationError("Invalid email or password.")
         return self._auth_response(user)
 
+    def update_profile(self, user: User, full_name: str | None) -> User:
+        """Update the user's editable profile fields."""
+        user.full_name = full_name
+        self.users.flush()
+        return user
+
+    def change_password(self, user: User, current_password: str, new_password: str) -> None:
+        """Change the password after verifying the current one."""
+        if not verify_password(current_password, user.hashed_password):
+            raise AuthenticationError("Current password is incorrect.")
+        user.hashed_password = hash_password(new_password)
+        self.users.flush()
+
     def _auth_response(self, user: User) -> AuthResponse:
         token = create_access_token(user.id)
         return AuthResponse(
