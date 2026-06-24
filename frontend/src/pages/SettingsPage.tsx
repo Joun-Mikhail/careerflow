@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 
 import { LogOutIcon } from '@/components/icons';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { initials } from '@/lib/format';
 import { passwordChangeSchema, profileSchema } from '@/lib/schemas';
 import { ApiError } from '@/services/api';
@@ -64,6 +65,7 @@ function ProfileCard({
   email: string;
   onSave: (fullName: string | null) => Promise<void>;
 }) {
+  const toast = useToast();
   const [value, setValue] = useState(fullName);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -82,8 +84,11 @@ function ProfileCard({
     try {
       await onSave(value.trim() || null);
       setSaved(true);
+      toast.success('Profile updated.');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not save profile.');
+      const message = err instanceof ApiError ? err.message : 'Could not save profile.';
+      setError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -121,6 +126,7 @@ function ProfileCard({
 }
 
 function PasswordCard() {
+  const toast = useToast();
   const [current, setCurrent] = useState('');
   const [next, setNext] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -148,8 +154,11 @@ function PasswordCard() {
       setCurrent('');
       setNext('');
       setConfirm('');
+      toast.success('Password changed.');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not change password.');
+      const message = err instanceof ApiError ? err.message : 'Could not change password.';
+      setError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }

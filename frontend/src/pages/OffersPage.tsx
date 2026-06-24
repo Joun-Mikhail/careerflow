@@ -6,6 +6,7 @@ import { EmptyState, ErrorState } from '@/components/feedback/States';
 import { TableSkeleton } from '@/components/feedback/Skeletons';
 import { DollarSignIcon, PlusIcon, TrashIcon } from '@/components/icons';
 import { Modal } from '@/components/ui/Modal';
+import { useToast } from '@/contexts/ToastContext';
 import { useApplications } from '@/hooks/useApplications';
 import { useDeleteOffer, useOffers, useUpdateOffer } from '@/hooks/useOffers';
 import { OFFER_DECISIONS, OFFER_DECISION_COLORS } from '@/lib/constants';
@@ -17,6 +18,7 @@ import { offersApi } from '@/services/offers';
 
 export function OffersPage() {
   const qc = useQueryClient();
+  const toast = useToast();
   const { data, isLoading, isError, refetch } = useOffers({ page_size: 100 });
   const { data: applicationData } = useApplications({ page_size: 100 });
   const updateOffer = useUpdateOffer();
@@ -37,6 +39,7 @@ export function OffersPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['offers'] });
       setCreating(false);
+      toast.success('Offer added.');
     },
   });
 
@@ -65,8 +68,11 @@ export function OffersPage() {
         },
       },
       {
-        onError: (err) =>
-          setFormError(err instanceof ApiError ? err.message : 'Could not save offer.'),
+        onError: (err) => {
+          const message = err instanceof ApiError ? err.message : 'Could not save offer.';
+          setFormError(message);
+          toast.error(message);
+        },
       },
     );
   }
@@ -154,7 +160,11 @@ export function OffersPage() {
                       <button
                         className="btn-icon btn-ghost"
                         aria-label="Delete offer"
-                        onClick={() => deleteOffer.mutate(offer.id)}
+                        onClick={() =>
+                          deleteOffer.mutate(offer.id, {
+                            onSuccess: () => toast.success('Offer deleted.'),
+                          })
+                        }
                       >
                         <TrashIcon width={16} height={16} />
                       </button>

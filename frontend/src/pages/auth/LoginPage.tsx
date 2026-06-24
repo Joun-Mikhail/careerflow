@@ -3,10 +3,12 @@ import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import { ApiError } from '@/services/api';
 
 export function LoginPage() {
   const { login } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
   const [email, setEmail] = useState('demo@careerflow.app');
   const [password, setPassword] = useState('DemoPass123!');
@@ -19,9 +21,12 @@ export function LoginPage() {
     setSubmitting(true);
     try {
       await login({ email, password });
+      toast.success('Welcome back!');
       navigate('/', { replace: true });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Unable to sign in. Please try again.');
+      const message = err instanceof ApiError ? err.message : 'Unable to sign in. Please try again.';
+      setError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }

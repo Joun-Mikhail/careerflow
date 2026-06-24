@@ -15,6 +15,7 @@ import {
 } from '@/components/icons';
 import { StatusBadge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
+import { useToast } from '@/contexts/ToastContext';
 import { useApplication, useDeleteApplication, useUpdateApplication } from '@/hooks/useApplications';
 import {
   useAttachments,
@@ -172,6 +173,7 @@ export function ApplicationDetailPage() {
 
 /* -- Interviews ----------------------------------------------------------- */
 function InterviewsSection({ applicationId }: { applicationId: string }) {
+  const toast = useToast();
   const { data: interviews = [], isLoading } = useInterviews(applicationId);
   const createInterview = useCreateInterview(applicationId);
   const deleteInterview = useDeleteInterview(applicationId);
@@ -183,16 +185,21 @@ function InterviewsSection({ applicationId }: { applicationId: string }) {
 
   async function add(e: FormEvent) {
     e.preventDefault();
-    await createInterview.mutateAsync({
-      scheduled_at: new Date(scheduledAt).toISOString(),
-      interviewer: interviewer || null,
-      round_type: roundType || null,
-      mode,
-    });
-    setOpen(false);
-    setScheduledAt('');
-    setInterviewer('');
-    setRoundType('');
+    try {
+      await createInterview.mutateAsync({
+        scheduled_at: new Date(scheduledAt).toISOString(),
+        interviewer: interviewer || null,
+        round_type: roundType || null,
+        mode,
+      });
+      setOpen(false);
+      setScheduledAt('');
+      setInterviewer('');
+      setRoundType('');
+      toast.success('Interview added.');
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Could not add interview.');
+    }
   }
 
   return (
