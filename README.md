@@ -34,6 +34,7 @@ from wishlist to offer, in one professional workspace.
 - [Development](#development)
 - [Testing & quality](#testing--quality)
 - [Security](#security)
+- [Reliability & observability](#reliability--observability)
 - [Deployment](#deployment)
 - [Documentation](#documentation)
 - [Roadmap](#roadmap)
@@ -304,10 +305,30 @@ CareerFlow was built with a security-first mindset and audited in a dedicated ph
 - Inputs are validated by Pydantic and persisted via bound parameters (no SQL injection).
 - Uploads are type/size-validated, stored off the web root with opaque names, and served
   only to their owner.
+- **Rate limiting** on the auth endpoints (`/auth/login`, `/auth/refresh`,
+  `/auth/change-password`) via SlowAPI, returning `429` with `Retry-After` and
+  `X-RateLimit-*` headers.
 - `bandit` and `pip-audit` run in CI and are currently clean.
 
 See [docs/05-security-design.md](docs/05-security-design.md) and the audit in
 [docs/security-review.md](docs/security-review.md).
+
+## Reliability & observability
+
+- **Global error boundary** — render-time exceptions show a recoverable
+  fallback ("Reload app") instead of a blank screen, and are reported to Sentry.
+- **Loading skeletons** — board, table, and detail views render shape-matching
+  skeletons while data loads, keeping layout stable.
+- **Toast notifications** — non-blocking success/error toasts on login, profile
+  and password changes, and offer/interview actions.
+- **Structured audit logging** — security-relevant actions (logins, password
+  changes, profile updates, offer decisions) emit one JSON line each with
+  timestamp, `user_id`, `action`, and `status` to a dedicated `careerflow.audit`
+  logger.
+- **Health probe** — `GET /health` reports database connectivity, app version,
+  and uptime, and returns `503` when the database is unreachable.
+- **Error monitoring (Sentry)** — optional, env-gated on both the API
+  (`SENTRY_DSN`) and the SPA (`VITE_SENTRY_DSN`); a no-op when unset.
 
 ## Deployment
 
