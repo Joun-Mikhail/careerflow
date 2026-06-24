@@ -6,21 +6,23 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { ApiError } from '@/services/api';
 
+const DEMO_EMAIL = 'demo@careerflow.app';
+const DEMO_PASSWORD = 'DemoPass123!';
+
 export function LoginPage() {
   const { login } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('demo@careerflow.app');
-  const [password, setPassword] = useState('DemoPass123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault();
+  async function doLogin(creds: { email: string; password: string }) {
     setError(null);
     setSubmitting(true);
     try {
-      await login({ email, password });
+      await login(creds);
       toast.success('Welcome back!');
       navigate('/', { replace: true });
     } catch (err) {
@@ -32,6 +34,15 @@ export function LoginPage() {
     }
   }
 
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    doLogin({ email, password });
+  }
+
+  function handleTryDemo() {
+    doLogin({ email: DEMO_EMAIL, password: DEMO_PASSWORD });
+  }
+
   return (
     <form className="auth-card" onSubmit={handleSubmit}>
       <div>
@@ -41,6 +52,18 @@ export function LoginPage() {
 
       {error && <div className="form-error" role="alert">{error}</div>}
 
+      <button
+        className="btn btn-primary btn-block"
+        type="button"
+        disabled={submitting}
+        onClick={handleTryDemo}
+        style={{ fontSize: '1.05rem', padding: '0.75rem 1rem' }}
+      >
+        {submitting ? 'Launching demo…' : '▶ Try demo — no signup needed'}
+      </button>
+
+      <div className="divider">or sign in with your account</div>
+
       <div className="field">
         <label className="label" htmlFor="email">Email</label>
         <input
@@ -48,6 +71,7 @@ export function LoginPage() {
           className="input"
           type="email"
           autoComplete="email"
+          placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -67,13 +91,9 @@ export function LoginPage() {
         />
       </div>
 
-      <button className="btn btn-primary btn-block" type="submit" disabled={submitting}>
+      <button className="btn btn-secondary btn-block" type="submit" disabled={submitting}>
         {submitting ? 'Signing in…' : 'Sign in'}
       </button>
-
-      <p className="subtle" style={{ textAlign: 'center' }}>
-        Demo account is pre-filled — just press Sign in.
-      </p>
 
       <div className="divider" />
       <p className="muted" style={{ textAlign: 'center' }}>
