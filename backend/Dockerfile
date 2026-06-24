@@ -29,6 +29,7 @@ COPY docker-entrypoint.sh ./
 # Run as a non-root user.
 RUN useradd --create-home --uid 1000 appuser \
     && mkdir -p /app/var/uploads \
+    && chmod +x /app/docker-entrypoint.sh \
     && chown -R appuser:appuser /app
 USER appuser
 
