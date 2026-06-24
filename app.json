@@ -1,0 +1,42 @@
+{
+  "name": "CareerFlow",
+  "description": "Track job applications, interviews, tasks, and career opportunities in one place.",
+  "repository": "https://github.com/Joun-Mikhail/careerflow",
+  "logo": "https://raw.githubusercontent.com/Joun-Mikhail/careerflow/main/frontend/public/favicon.svg",
+  "keywords": ["python", "fastapi", "react", "typescript", "postgres", "job-search"],
+  "stack": "container",
+  "addons": [
+    {
+      "plan": "heroku-postgresql:essential-0",
+      "as": "DATABASE"
+    }
+  ],
+  "env": {
+    "JWT_SECRET": {
+      "description": "Secret used to sign JWT access and refresh tokens. Must be at least 32 characters.",
+      "generator": "secret"
+    },
+    "CAREERFLOW_ENV": {
+      "description": "Runtime environment (production | staging | development).",
+      "value": "production"
+    },
+    "SEED_DEMO_DATA": {
+      "description": "If true, seed a demo user and sample data on first launch.",
+      "value": "true"
+    },
+    "CORS_ORIGINS": {
+      "description": "Comma-separated list of allowed browser origins (the frontend URL).",
+      "value": "*",
+      "required": false
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "scripts": {
+    "postdeploy": "alembic upgrade head"
+  }
+}

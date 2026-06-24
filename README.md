@@ -50,8 +50,33 @@ follow-up is due — ends up scattered and forgotten. CareerFlow centralizes it 
 source of truth and turns it into something you can actually reason about, with a pipeline board,
 reminders, and analytics on what's converting.
 
-> **Try it instantly:** the stack seeds a demo account on first launch —
-> **`demo@careerflow.app` / `DemoPass123!`** (pre-filled on the login screen).
+## Try it in 30 seconds
+
+**Live demo:** [frontend-jade-two-zfchqjb5ws.vercel.app](https://frontend-jade-two-zfchqjb5ws.vercel.app) — open it and press **▶ Try demo — no signup needed** on the login screen.
+
+Want your own copy? Deploy the full stack (API + Postgres + web) with a single click:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Joun-Mikhail/careerflow)
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Joun-Mikhail/careerflow)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FJoun-Mikhail%2Fcareerflow&root-directory=frontend&env=VITE_API_BASE_URL&envDescription=Base+URL+of+your+CareerFlow+API+e.g.+https%3A%2F%2Fexample.com%2Fapi%2Fv1)
+
+| Button | What it provisions |
+| --- | --- |
+| **Render** | Backend (Docker) + managed Postgres + static frontend, all from [`render.yaml`](render.yaml). |
+| **Heroku** | Backend (container stack) + Heroku Postgres add-on, from [`app.json`](app.json). |
+| **Vercel** | Frontend only (point `VITE_API_BASE_URL` at any CareerFlow API). |
+
+The seed routine creates a demo account on first boot — **`demo@careerflow.app` / `DemoPass123!`** — pre-wired to the Try-demo button.
+
+### Install as a native-feeling app
+
+CareerFlow is a **Progressive Web App**. From any modern browser:
+
+- **Chrome / Edge** — click the install icon (⊕) in the address bar, or *Menu → Install CareerFlow*.
+- **Safari (iOS / iPadOS)** — *Share → Add to Home Screen*.
+- **Firefox (Android)** — *Menu → Install*.
+
+It then launches in its own window, works offline for the shell, and shows up alongside your native apps. No store, no download.
 
 ## Features
 
