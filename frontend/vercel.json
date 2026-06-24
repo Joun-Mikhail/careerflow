@@ -3,5 +3,10 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/install", "destination": "/install/index.html" },
+    { "source": "/install/", "destination": "/install/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
