@@ -12,19 +12,16 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install runtime dependencies first for better layer caching. Only the
-# project metadata is copied so the dependency layer is reused unless it
-# changes. (psycopg ships a binary wheel, so no system build deps are needed.)
+# Install the project's runtime dependencies straight from pyproject.toml, so
+# the image can never drift from the declared dependency set. The application
+# source is needed for the build backend to resolve the package.
+# (psycopg ships a binary wheel, so no system build deps are needed.)
 COPY pyproject.toml README.md ./
-RUN pip install --upgrade "pip>=24.2" "setuptools>=78.1.1" \
-    && pip install "fastapi>=0.111,<1.0" "uvicorn[standard]>=0.30,<1.0" \
-       "sqlalchemy>=2.0.30,<2.1" "alembic>=1.13,<2.0" "pydantic>=2.7,<3.0" \
-       "pydantic-settings>=2.3,<3.0" "psycopg[binary]>=3.1,<4.0" \
-       "bcrypt>=4.1,<5.0" "pyjwt>=2.8,<3.0" "python-multipart>=0.0.9,<1.0" \
-       "email-validator>=2.1,<3.0"
-
-# Copy the application source and migrations.
 COPY app ./app
+RUN pip install --upgrade "pip>=24.2" "setuptools>=78.1.1" \
+    && pip install --no-cache-dir .
+
+# Copy migrations and the entrypoint.
 COPY alembic ./alembic
 COPY alembic.ini ./
 COPY docker-entrypoint.sh ./
