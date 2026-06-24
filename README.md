@@ -8,6 +8,7 @@ Stop losing track of your job search across spreadsheets and inboxes — manage 
 from wishlist to offer, in one professional workspace.
 
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
+[![Mobile build](https://img.shields.io/badge/Mobile-iOS_·_Android-000?logo=apple&logoColor=white)](.github/workflows/mobile-build.yml)
 [![Backend](https://img.shields.io/badge/Python-3.11_·_3.12-3776AB?logo=python&logoColor=white)](backend/)
 [![Frontend](https://img.shields.io/badge/React_18-TypeScript-3178C6?logo=react&logoColor=white)](frontend/)
 [![Coverage](https://img.shields.io/badge/backend_coverage-97%25-brightgreen)](backend/)
@@ -52,7 +53,16 @@ reminders, and analytics on what's converting.
 
 ## Try it in 30 seconds
 
-**Live demo:** [frontend-jade-two-zfchqjb5ws.vercel.app](https://frontend-jade-two-zfchqjb5ws.vercel.app) — open it and press **▶ Try demo — no signup needed** on the login screen.
+**One link, every platform:**
+[**app.careerflow.app/install**](https://frontend-jade-two-zfchqjb5ws.vercel.app/install) — the page detects your device and points you at the App Store, Google Play, or the PWA install prompt.
+
+**Live demo on the web:** [frontend-jade-two-zfchqjb5ws.vercel.app](https://frontend-jade-two-zfchqjb5ws.vercel.app) — open it and press **▶ Try demo — no signup needed** on the login screen.
+
+[![App Store](https://img.shields.io/badge/App%20Store-coming%20soon-000?logo=apple&logoColor=white)](https://frontend-jade-two-zfchqjb5ws.vercel.app/install)
+[![Google Play](https://img.shields.io/badge/Google%20Play-coming%20soon-000?logo=googleplay&logoColor=white)](https://frontend-jade-two-zfchqjb5ws.vercel.app/install)
+[![Install PWA](https://img.shields.io/badge/Install%20PWA-from%20your%20browser-4f46e5)](https://frontend-jade-two-zfchqjb5ws.vercel.app)
+
+> Native iOS and Android apps build from the same codebase via Capacitor — see [`docs/app-store-submission.md`](docs/app-store-submission.md) for how to ship them.
 
 Want your own copy? Deploy the full stack (API + Postgres + web) with a single click:
 
