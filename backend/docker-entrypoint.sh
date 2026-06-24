@@ -4,6 +4,24 @@
 # seconds after the container starts, so startup must tolerate a cold database.
 set -e
 
+# Normalize DATABASE_URL once, before anything (this probe, Alembic, the app)
+# uses it. Managed Postgres providers (Render, Heroku, Supabase, ...) hand out
+# bare "postgresql://..." / "postgres://..." DSNs; SQLAlchemy then loads the
+# psycopg2 dialect, which the image does NOT ship — we use psycopg v3 instead.
+# Rewriting the scheme picks the right driver and prevents the classic
+# "ModuleNotFoundError: No module named 'psycopg2'" crash at startup.
+if [ -n "${DATABASE_URL:-}" ]; then
+  case "$DATABASE_URL" in
+    postgres://*)
+      DATABASE_URL="postgresql+psycopg://${DATABASE_URL#postgres://}"
+      ;;
+    postgresql://*)
+      DATABASE_URL="postgresql+psycopg://${DATABASE_URL#postgresql://}"
+      ;;
+  esac
+  export DATABASE_URL
+fi
+
 python - <<'PY'
 import os
 import sys
