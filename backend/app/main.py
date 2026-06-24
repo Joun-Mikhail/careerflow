@@ -15,10 +15,13 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from app.core.config import get_settings
 from app.core.errors import DomainError
 from app.core.logging import configure_logging, get_logger
+from app.core.ratelimit import limiter
 
 settings = get_settings()
 logger = get_logger("app.main")
@@ -41,6 +44,11 @@ def create_app() -> FastAPI:
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",
     )
+
+    # Rate limiting: register the shared limiter and its middleware. Limited
+    # routes opt in via the @limiter.limit decorator.
+    app.state.limiter = limiter
+    app.add_middleware(SlowAPIMiddleware)
 
     _configure_middleware(app)
     _configure_exception_handlers(app)
@@ -84,6 +92,17 @@ def _configure_exception_handlers(app: FastAPI) -> None:
             status_code=exc.status_code,
             content=_error_body(exc.code, exc.message, exc.details),
         )
+
+    @app.exception_handler(RateLimitExceeded)
+    async def handle_rate_limit(request: Request, exc: RateLimitExceeded) -> Response:
+        response = JSONResponse(
+            status_code=429,
+            content=_error_body(
+                "rate_limited", "Too many requests. Please slow down and try again shortly."
+            ),
+        )
+        # Attach the X-RateLimit-* / Retry-After headers slowapi computed.
+        return request.app.state.limiter._inject_headers(response, request.state.view_rate_limit)
 
     @app.exception_handler(RequestValidationError)
     async def handle_validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:

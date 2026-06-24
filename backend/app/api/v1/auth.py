@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Request, Response, status
 
 from app.api.deps import CurrentUser, DbSession
+from app.core.ratelimit import AUTH_RATE_LIMIT, limiter
 from app.schemas.base import MessageResponse
 from app.schemas.user import (
     AuthResponse,
@@ -31,12 +32,16 @@ def register(data: UserCreate, db: DbSession) -> AuthResponse:
 
 
 @router.post("/login", response_model=AuthResponse, summary="Authenticate and receive a token")
-def login(data: UserLogin, db: DbSession) -> AuthResponse:
+@limiter.limit(AUTH_RATE_LIMIT)
+def login(request: Request, response: Response, data: UserLogin, db: DbSession) -> AuthResponse:
     return AuthService(db).authenticate(data.email, data.password)
 
 
 @router.post("/refresh", response_model=AuthResponse, summary="Rotate tokens via refresh token")
-def refresh(data: RefreshRequest, db: DbSession) -> AuthResponse:
+@limiter.limit(AUTH_RATE_LIMIT)
+def refresh(
+    request: Request, response: Response, data: RefreshRequest, db: DbSession
+) -> AuthResponse:
     return AuthService(db).refresh(data.refresh_token)
 
 
@@ -56,8 +61,13 @@ def update_me(data: ProfileUpdate, current_user: CurrentUser, db: DbSession) -> 
     response_model=MessageResponse,
     summary="Change the current user's password",
 )
+@limiter.limit(AUTH_RATE_LIMIT)
 def change_password(
-    data: PasswordChange, current_user: CurrentUser, db: DbSession
+    request: Request,
+    response: Response,
+    data: PasswordChange,
+    current_user: CurrentUser,
+    db: DbSession,
 ) -> MessageResponse:
     AuthService(db).change_password(current_user, data.current_password, data.new_password)
     return MessageResponse(message="Password updated successfully.")
