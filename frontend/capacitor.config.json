@@ -1,0 +1,22 @@
+{
+  "appId": "com.careerflow.app",
+  "appName": "CareerFlow",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "ios": {
+    "contentInset": "automatic"
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "backgroundColor": "#4f46e5",
+      "showSpinner": false
+    }
+  }
+}

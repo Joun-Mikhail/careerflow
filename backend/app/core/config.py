@@ -56,9 +56,20 @@ class Settings(BaseSettings):
 
     # --- CORS --------------------------------------------------------------
     # ``NoDecode`` stops pydantic-settings from JSON-decoding the env value so
-    # the validator below can accept a plain comma-separated string.
+    # the validator below can accept a plain comma-separated string. Defaults
+    # cover the Vite dev server plus the Capacitor wrapper's WebView origins
+    # (https://localhost on Android, capacitor://localhost on iOS) so the
+    # mobile app talks to a local backend out of the box.
     cors_origins: Annotated[list[str], NoDecode] = Field(
-        default_factory=lambda: ["http://localhost:5173"], alias="CORS_ORIGINS"
+        default_factory=lambda: [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "https://localhost",
+            "http://localhost",
+            "capacitor://localhost",
+            "ionic://localhost",
+        ],
+        alias="CORS_ORIGINS",
     )
 
     # --- Observability -----------------------------------------------------

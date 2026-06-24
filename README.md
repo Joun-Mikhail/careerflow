@@ -8,6 +8,7 @@ Stop losing track of your job search across spreadsheets and inboxes — manage 
 from wishlist to offer, in one professional workspace.
 
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
+[![Mobile build](https://img.shields.io/badge/Mobile-iOS_·_Android-000?logo=apple&logoColor=white)](.github/workflows/mobile-build.yml)
 [![Backend](https://img.shields.io/badge/Python-3.11_·_3.12-3776AB?logo=python&logoColor=white)](backend/)
 [![Frontend](https://img.shields.io/badge/React_18-TypeScript-3178C6?logo=react&logoColor=white)](frontend/)
 [![Coverage](https://img.shields.io/badge/backend_coverage-97%25-brightgreen)](backend/)
@@ -52,7 +53,16 @@ reminders, and analytics on what's converting.
 
 ## Try it in 30 seconds
 
-**Live demo:** [frontend-jade-two-zfchqjb5ws.vercel.app](https://frontend-jade-two-zfchqjb5ws.vercel.app) — open it and press **▶ Try demo — no signup needed** on the login screen.
+**One link, every platform:**
+[**app.careerflow.app/install**](https://frontend-jade-two-zfchqjb5ws.vercel.app/install) — the page detects your device and points you at the App Store, Google Play, or the PWA install prompt.
+
+**Live demo on the web:** [frontend-jade-two-zfchqjb5ws.vercel.app](https://frontend-jade-two-zfchqjb5ws.vercel.app) — open it and press **▶ Try demo — no signup needed** on the login screen.
+
+[![App Store](https://img.shields.io/badge/App%20Store-coming%20soon-000?logo=apple&logoColor=white)](https://frontend-jade-two-zfchqjb5ws.vercel.app/install)
+[![Google Play](https://img.shields.io/badge/Google%20Play-coming%20soon-000?logo=googleplay&logoColor=white)](https://frontend-jade-two-zfchqjb5ws.vercel.app/install)
+[![Install PWA](https://img.shields.io/badge/Install%20PWA-from%20your%20browser-4f46e5)](https://frontend-jade-two-zfchqjb5ws.vercel.app)
+
+> Native iOS and Android apps build from the same codebase via Capacitor — see [`docs/app-store-submission.md`](docs/app-store-submission.md) for how to ship them.
 
 Want your own copy? Deploy the full stack (API + Postgres + web) with a single click:
 
@@ -89,7 +99,9 @@ It then launches in its own window, works offline for the shell, and shows up al
 - 📝 **Notes** — Markdown notes per application.
 - 📎 **Attachments** — secure resume/cover-letter uploads (validated, owner-only download).
 - 📊 **Dashboard & analytics** — headline stats, upcoming interviews, pending tasks, and Recharts visualizations (applications over time, status & industry distribution, conversion rates).
+- 📤 **CSV export** — download your whole pipeline as an RFC-4180 CSV (Excel/Sheets-ready) in one click.
 - ⚙️ **Settings** — update your profile and change your password.
+- 📱 **Installable PWA + mobile UI** — install to a phone/desktop home screen; on small screens the sidebar becomes a slide-in drawer.
 - 🌗 **Polished UX** — responsive layout, light/dark themes, Zod-validated forms, and proper loading / empty / error states throughout.
 
 ## Screenshots
@@ -100,13 +112,18 @@ It then launches in its own window, works offline for the shell, and shows up al
   <img src="docs/screenshots/demo.gif" alt="CareerFlow walkthrough: dashboard, pipeline board, application detail, tasks, analytics" width="780" />
 </p>
 
-| Pipeline board | Application detail |
+| Dashboard | Pipeline board |
 | --- | --- |
-| <img src="docs/screenshots/applications-board.png" alt="Kanban pipeline board" /> | <img src="docs/screenshots/application-detail.png" alt="Application detail with interviews, notes, attachments" /> |
+| <img src="docs/screenshots/dashboard.png" alt="Dashboard with headline stats, upcoming interviews and pending tasks" /> | <img src="docs/screenshots/applications-board.png" alt="Kanban pipeline board" /> |
+| **Application detail** | **Analytics** |
+| <img src="docs/screenshots/application-detail.png" alt="Application detail with interviews, notes, attachments" /> | <img src="docs/screenshots/analytics.png" alt="Analytics charts" /> |
 | **Offers** | **Interviews** |
 | <img src="docs/screenshots/offers.png" alt="Offers with salary, bonus, and decision status" /> | <img src="docs/screenshots/interviews.png" alt="Global interviews list" /> |
-| **Analytics** | **Light theme** |
-| <img src="docs/screenshots/analytics.png" alt="Analytics charts" /> | <img src="docs/screenshots/dashboard-light.png" alt="Dashboard in light mode" /> |
+
+<p align="center">
+  <img src="docs/screenshots/mobile-dashboard.png" alt="CareerFlow on mobile with the slide-in navigation drawer" width="300" />
+</p>
+<p align="center"><sub>On phones the sidebar collapses into a slide-in drawer — the app installs to your home screen as a PWA.</sub></p>
 
 ## Tech stack
 

@@ -1,0 +1,5 @@
+# Netlify-style redirects for the Install landing page.
+# When hosted on a provider that respects this file, /install resolves to the
+# landing page; everything else falls through to the SPA.
+/install            /install/index.html   200
+/install/           /install/index.html   200

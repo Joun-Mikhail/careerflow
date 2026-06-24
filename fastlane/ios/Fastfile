@@ -1,0 +1,66 @@
+default_platform(:ios)
+
+# CareerFlow iOS publishing lanes.
+#
+# Required env vars (set as GitHub Actions secrets, never committed):
+#   FASTLANE_USER                                 — Apple ID email
+#   FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD  — app-specific password
+#   APPLE_TEAM_ID                                 — 10-char Apple team ID
+#   MATCH_PASSWORD                                — passphrase for fastlane match (if used)
+#   MATCH_GIT_URL                                 — private repo with signing certs
+#
+# Generate the Apple ID app-specific password at
+#   https://appleid.apple.com/account/manage > App-Specific Passwords.
+
+platform :ios do
+  desc "Sync code signing (uses fastlane match)"
+  lane :certs do
+    match(type: "appstore", readonly: is_ci)
+  end
+
+  desc "Build an iOS archive (unsigned if credentials are missing)"
+  lane :build do
+    if ENV["MATCH_PASSWORD"] && ENV["MATCH_GIT_URL"]
+      certs
+    else
+      UI.important "MATCH_PASSWORD / MATCH_GIT_URL not set — producing an unsigned archive."
+    end
+
+    build_app(
+      workspace: "App.xcworkspace",
+      scheme: "App",
+      export_method: "app-store",
+      output_directory: "fastlane/build/ios",
+      output_name: "CareerFlow.ipa",
+      include_symbols: false,
+      skip_codesigning: ENV["MATCH_PASSWORD"].nil?,
+      silent: true
+    )
+
+    ipa_path = Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+    UI.success("IPA: #{ipa_path}") if ipa_path
+  end
+
+  desc "Upload the latest build to TestFlight"
+  lane :beta do
+    build
+    pilot(
+      skip_submission: true,
+      skip_waiting_for_build_processing: false
+    )
+  end
+
+  desc "Submit a release build to App Store Connect"
+  lane :release do
+    increment_build_number(xcodeproj: "App.xcodeproj")
+    build
+    deliver(
+      submit_for_review: false,
+      automatic_release: false,
+      force: true,
+      skip_screenshots: false,
+      skip_metadata: false,
+      metadata_path: "../metadata/ios"
+    )
+  end
+end
