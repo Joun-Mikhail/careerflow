@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ApplicationForm } from '@/components/forms/ApplicationForm';
-import { EmptyState, ErrorState, LoadingState } from '@/components/feedback/States';
+import { EmptyState, ErrorState } from '@/components/feedback/States';
+import { BoardSkeleton, TableSkeleton } from '@/components/feedback/Skeletons';
 import { BriefcaseIcon, MapPinIcon, PlusIcon, SearchIcon } from '@/components/icons';
 import { StatusBadge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
@@ -98,7 +99,13 @@ export function ApplicationsPage() {
       </div>
 
       {isLoading ? (
-        <LoadingState />
+        view === 'board' ? (
+          <BoardSkeleton />
+        ) : (
+          <div className="card">
+            <TableSkeleton columns={5} />
+          </div>
+        )
       ) : isError ? (
         <ErrorState error={null} onRetry={refetch} />
       ) : applications.length === 0 ? (

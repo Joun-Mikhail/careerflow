@@ -3,7 +3,8 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { ApplicationForm } from '@/components/forms/ApplicationForm';
-import { ErrorState, LoadingState } from '@/components/feedback/States';
+import { ErrorState } from '@/components/feedback/States';
+import { DetailSkeleton } from '@/components/feedback/Skeletons';
 import {
   CalendarIcon,
   ChevronLeftIcon,
@@ -51,7 +52,7 @@ export function ApplicationDetailPage() {
   const [editing, setEditing] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
-  if (isLoading) return <LoadingState />;
+  if (isLoading) return <DetailSkeleton />;
   if (isError || !application) return <ErrorState error={null} onRetry={refetch} />;
 
   async function handleEdit(values: ApplicationInput) {

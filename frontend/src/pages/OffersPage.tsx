@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { EmptyState, ErrorState, LoadingState } from '@/components/feedback/States';
+import { EmptyState, ErrorState } from '@/components/feedback/States';
+import { TableSkeleton } from '@/components/feedback/Skeletons';
 import { DollarSignIcon, PlusIcon, TrashIcon } from '@/components/icons';
 import { Modal } from '@/components/ui/Modal';
 import { useApplications } from '@/hooks/useApplications';
@@ -89,7 +90,7 @@ export function OffersPage() {
 
       <div className="card">
         {isLoading ? (
-          <LoadingState />
+          <TableSkeleton columns={6} />
         ) : isError ? (
           <ErrorState error={null} onRetry={refetch} />
         ) : offers.length === 0 ? (

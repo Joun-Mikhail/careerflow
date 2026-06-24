@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { EmptyState, ErrorState, LoadingState } from '@/components/feedback/States';
+import { EmptyState, ErrorState } from '@/components/feedback/States';
+import { TableSkeleton } from '@/components/feedback/Skeletons';
 import { CalendarIcon } from '@/components/icons';
 import { useApplications } from '@/hooks/useApplications';
 import { useAllInterviews } from '@/hooks/useInterviewsAll';
@@ -60,7 +61,7 @@ export function InterviewsPage() {
 
       <div className="card">
         {isLoading ? (
-          <LoadingState />
+          <TableSkeleton columns={5} />
         ) : isError ? (
           <ErrorState error={null} onRetry={refetch} />
         ) : interviews.length === 0 ? (
