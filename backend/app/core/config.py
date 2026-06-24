@@ -87,6 +87,29 @@ class Settings(BaseSettings):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
 
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def _normalize_database_url(cls, value: object) -> object:
+        """Pin SQLAlchemy to the psycopg (v3) driver we actually ship.
+
+        Managed Postgres providers (Render, Heroku, Supabase, etc.) hand out
+        DSNs with the bare ``postgresql://`` scheme. SQLAlchemy then tries to
+        load its default Postgres dialect, which is ``psycopg2`` — a module
+        that is *not* installed in our image. The result is a startup crash
+        with ``ModuleNotFoundError: No module named 'psycopg2'``.
+
+        Rewriting the scheme to ``postgresql+psycopg`` is the official
+        SQLAlchemy 2.0 way to select the v3 driver; it is a no-op when the
+        URL already names a driver.
+        """
+        if isinstance(value, str):
+            if value.startswith("postgres://"):
+                # Heroku-style legacy scheme.
+                value = "postgresql://" + value[len("postgres://") :]
+            if value.startswith("postgresql://"):
+                return "postgresql+psycopg://" + value[len("postgresql://") :]
+        return value
+
     @property
     def is_production(self) -> bool:
         return self.environment == "production"

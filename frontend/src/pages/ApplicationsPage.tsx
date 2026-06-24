@@ -4,14 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import { ApplicationForm } from '@/components/forms/ApplicationForm';
 import { EmptyState, ErrorState } from '@/components/feedback/States';
 import { BoardSkeleton, TableSkeleton } from '@/components/feedback/Skeletons';
-import { BriefcaseIcon, MapPinIcon, PlusIcon, SearchIcon } from '@/components/icons';
+import { BriefcaseIcon, DownloadIcon, MapPinIcon, PlusIcon, SearchIcon } from '@/components/icons';
 import { StatusBadge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
+import { useToast } from '@/contexts/ToastContext';
 import { useApplications, useCreateApplication } from '@/hooks/useApplications';
 import { useCompanies } from '@/hooks/useCompanies';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { PIPELINE_STATUSES } from '@/lib/constants';
-import { formatSalaryRange, statusLabel } from '@/lib/format';
+import { downloadCsv, toCsv } from '@/lib/csv';
+import { formatDate, formatSalaryRange, statusLabel } from '@/lib/format';
 import type { Application, ApplicationStatus } from '@/lib/types';
 import { ApiError } from '@/services/api';
 import type { ApplicationInput } from '@/services/applications';
@@ -20,6 +22,7 @@ type View = 'board' | 'list';
 
 export function ApplicationsPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [view, setView] = useState<View>('board');
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 300);
@@ -60,6 +63,39 @@ export function ApplicationsPage() {
     }
   }
 
+  function handleExport() {
+    if (applications.length === 0) {
+      toast.error('Nothing to export yet.');
+      return;
+    }
+    const rows = applications.map((app) => ({
+      role: app.role_title,
+      company: companyName(app.company_id),
+      status: statusLabel(app.status),
+      salary_min: app.salary_min ?? '',
+      salary_max: app.salary_max ?? '',
+      currency: app.salary_currency ?? '',
+      location: app.is_remote ? 'Remote' : (app.location ?? ''),
+      source: app.source ?? '',
+      url: app.application_url ?? '',
+      applied: app.applied_at ? formatDate(app.applied_at) : '',
+    }));
+    const csv = toCsv(rows, [
+      { key: 'role', header: 'Role' },
+      { key: 'company', header: 'Company' },
+      { key: 'status', header: 'Status' },
+      { key: 'salary_min', header: 'Salary min' },
+      { key: 'salary_max', header: 'Salary max' },
+      { key: 'currency', header: 'Currency' },
+      { key: 'location', header: 'Location' },
+      { key: 'source', header: 'Source' },
+      { key: 'url', header: 'URL' },
+      { key: 'applied', header: 'Applied' },
+    ]);
+    downloadCsv('careerflow-applications.csv', csv);
+    toast.success(`Exported ${rows.length} application${rows.length === 1 ? '' : 's'}.`);
+  }
+
   return (
     <>
       <div className="page-header">
@@ -67,9 +103,18 @@ export function ApplicationsPage() {
           <h1 className="page-title">Applications</h1>
           <p className="page-subtitle">Your pipeline from wishlist to offer.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setCreating(true)}>
-          <PlusIcon /> Add application
-        </button>
+        <div className="row" style={{ gap: 'var(--space-2)' }}>
+          <button
+            className="btn btn-secondary"
+            onClick={handleExport}
+            disabled={applications.length === 0}
+          >
+            <DownloadIcon width={16} height={16} /> Export CSV
+          </button>
+          <button className="btn btn-primary" onClick={() => setCreating(true)}>
+            <PlusIcon /> Add application
+          </button>
+        </div>
       </div>
 
       <div className="toolbar">

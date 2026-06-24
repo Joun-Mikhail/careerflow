@@ -270,6 +270,28 @@ h4 {
   gap: var(--space-2);
   position: relative;
   overflow: hidden;
+  transition:
+    box-shadow 0.16s ease,
+    transform 0.16s ease,
+    border-color 0.16s ease;
+}
+/* A subtle accent rail on the left edge that warms up on hover. */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--accent, var(--brand-500));
+  opacity: 0.55;
+  transition: opacity 0.16s ease;
+}
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+}
+.stat-card:hover::before {
+  opacity: 1;
 }
 .stat-card .stat-icon {
   position: absolute;
@@ -280,8 +302,8 @@ h4 {
   border-radius: var(--radius);
   display: grid;
   place-items: center;
-  background: var(--brand-50);
-  color: var(--brand-600);
+  background: color-mix(in srgb, var(--accent, var(--brand-500)) 14%, transparent);
+  color: var(--accent, var(--brand-600));
 }
 .stat-label {
   color: var(--text-muted);
@@ -890,13 +912,70 @@ h4 {
   background: var(--surface-hover);
   color: var(--text);
 }
+.icon-btn {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 8px;
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.icon-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* The hamburger and the in-topbar brand only exist on mobile. */
+.nav-toggle,
+.topbar-brand {
+  display: none;
+}
+.sidebar-backdrop {
+  display: none;
+}
 
 @media (max-width: 900px) {
   .app-shell {
     grid-template-columns: 1fr;
   }
+  /* The sidebar becomes a slide-in drawer instead of vanishing. */
   .sidebar {
-    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    width: min(82vw, var(--sidebar-width));
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(2, 6, 23, 0.55);
+    backdrop-filter: blur(2px);
+    animation: fade-in 0.18s ease;
+  }
+  .nav-toggle,
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .topbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
   .detail-grid,
   .form-row {
@@ -907,6 +986,15 @@ h4 {
   }
   .auth-hero {
     display: none;
+  }
+  .page {
+    padding: var(--space-4);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
   }
 }
 

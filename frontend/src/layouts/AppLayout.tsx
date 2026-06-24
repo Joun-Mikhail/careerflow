@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 
 import {
   BarChartIcon,
@@ -9,6 +10,7 @@ import {
   DashboardIcon,
   DollarSignIcon,
   LogOutIcon,
+  MenuIcon,
   MoonIcon,
   SettingsIcon,
   SunIcon,
@@ -31,10 +33,27 @@ const NAV_ITEMS = [
 export function AppLayout() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [navOpen, setNavOpen] = useState(false);
+  const location = useLocation();
+
+  // Close the mobile drawer whenever the route changes.
+  useEffect(() => {
+    setNavOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll while the drawer is open on mobile.
+  useEffect(() => {
+    document.body.style.overflow = navOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [navOpen]);
 
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      {navOpen && <div className="sidebar-backdrop" onClick={() => setNavOpen(false)} />}
+
+      <aside className={`sidebar${navOpen ? ' open' : ''}`}>
         <div className="sidebar-brand">
           <img src="/favicon.svg" alt="" className="logo" />
           CareerFlow
@@ -74,6 +93,18 @@ export function AppLayout() {
 
       <div className="main">
         <header className="topbar">
+          <button
+            className="icon-btn nav-toggle"
+            onClick={() => setNavOpen((v) => !v)}
+            aria-label="Open navigation menu"
+            aria-expanded={navOpen}
+          >
+            <MenuIcon />
+          </button>
+          <div className="topbar-brand">
+            <img src="/favicon.svg" alt="" className="logo" width={22} height={22} />
+            CareerFlow
+          </div>
           <div className="spacer" />
           <button
             className="theme-toggle"

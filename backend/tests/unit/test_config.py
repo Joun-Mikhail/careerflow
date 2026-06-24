@@ -23,3 +23,23 @@ def test_production_rejects_placeholder_secret(monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.setenv("JWT_SECRET", "change-me-in-production")
     with pytest.raises(RuntimeError):
         Settings().validate_for_runtime()
+
+
+def test_database_url_picks_psycopg_driver(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql://user:pass@host:5432/db")
+    assert Settings().database_url == "postgresql+psycopg://user:pass@host:5432/db"
+
+
+def test_database_url_rewrites_heroku_legacy_scheme(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgres://u:p@h:5432/d")
+    assert Settings().database_url == "postgresql+psycopg://u:p@h:5432/d"
+
+
+def test_database_url_preserves_explicit_driver(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@h:5432/d")
+    assert Settings().database_url == "postgresql+psycopg://u:p@h:5432/d"
+
+
+def test_database_url_passes_through_sqlite(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///./test.db")
+    assert Settings().database_url == "sqlite:///./test.db"
