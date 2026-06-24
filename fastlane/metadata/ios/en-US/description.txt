@@ -1,0 +1,18 @@
+CareerFlow helps you run your job search like a pipeline instead of a pile of
+spreadsheets and inbox folders.
+
+Track every application from wishlist to offer on a Kanban board. Log
+interviews with date, type, interviewer, and outcome. Capture follow-up tasks
+with priorities and due dates. Save notes and resume versions per application.
+Compare offers side by side. Watch your conversion rates trend over time.
+
+Highlights:
+- Eight-stage pipeline (Wishlist, Applied, Assessment, Interview, Final, Offer, Rejected, Accepted) on a sortable Kanban board.
+- Interviews and tasks with reminders.
+- Offer tracking with base salary, bonus, equity, and decision status.
+- Per-application notes and secure attachments.
+- Dashboard and analytics: applications over time, status mix, conversion rates.
+- Light and dark themes.
+- End-to-end encryption in transit; your data stays scoped to your account.
+
+CareerFlow is the same codebase open-sourced at github.com/Joun-Mikhail/careerflow.

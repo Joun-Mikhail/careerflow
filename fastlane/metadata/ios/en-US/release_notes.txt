@@ -1,0 +1,1 @@
+Initial release. Track applications, interviews, tasks, offers, and notes.

@@ -1,0 +1,61 @@
+default_platform(:android)
+
+# CareerFlow Android publishing lanes.
+#
+# Required env vars (set as GitHub Actions secrets, never committed):
+#   GOOGLE_PLAY_JSON_KEY        — contents of the service-account JSON key
+#                                 (https://play.google.com/console > Setup > API access)
+#   ANDROID_KEYSTORE_BASE64     — base64-encoded upload keystore (.jks)
+#   ANDROID_KEYSTORE_PASSWORD   — keystore password
+#   ANDROID_KEY_ALIAS           — key alias inside the keystore
+#   ANDROID_KEY_PASSWORD        — key password
+#
+# The Gradle build expects the upload keystore at android/app/upload.keystore.
+# CI is responsible for writing the decoded keystore to that path before
+# invoking `lane :build`.
+
+platform :android do
+  desc "Build a signed release AAB"
+  lane :build do
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android",
+      properties: {
+        "android.injected.signing.store.file"     => ENV["ANDROID_KEYSTORE_FILE"]     || "upload.keystore",
+        "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias"      => ENV["ANDROID_KEY_ALIAS"],
+        "android.injected.signing.key.password"   => ENV["ANDROID_KEY_PASSWORD"]
+      }
+    )
+    aab = Dir["android/app/build/outputs/bundle/release/*.aab"].first
+    UI.success("AAB: #{aab}") if aab
+  end
+
+  desc "Upload to Play Store internal track"
+  lane :beta do
+    build
+    supply(
+      track: "internal",
+      json_key_data: ENV["GOOGLE_PLAY_JSON_KEY"],
+      package_name: "com.careerflow.app",
+      aab: Dir["android/app/build/outputs/bundle/release/*.aab"].first,
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      metadata_path: "../metadata/android"
+    )
+  end
+
+  desc "Promote a build from internal → production"
+  lane :release do
+    build
+    supply(
+      track: "production",
+      json_key_data: ENV["GOOGLE_PLAY_JSON_KEY"],
+      package_name: "com.careerflow.app",
+      aab: Dir["android/app/build/outputs/bundle/release/*.aab"].first,
+      metadata_path: "../metadata/android"
+    )
+  end
+end
