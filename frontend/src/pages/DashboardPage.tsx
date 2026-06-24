@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 
 import { EmptyState, ErrorState, LoadingState } from '@/components/feedback/States';
@@ -23,10 +24,10 @@ export function DashboardPage() {
   const firstName = user?.full_name?.split(' ')[0] ?? 'there';
 
   const stats = [
-    { label: 'Applications', value: totals.applications, icon: BriefcaseIcon },
-    { label: 'Interviews', value: totals.interviews, icon: CalendarIcon },
-    { label: 'Offers', value: totals.offers, icon: DashboardIcon },
-    { label: 'Success rate', value: `${success_rate}%`, icon: CheckSquareIcon },
+    { label: 'Applications', value: totals.applications, icon: BriefcaseIcon, accent: '#4f46e5' },
+    { label: 'Interviews', value: totals.interviews, icon: CalendarIcon, accent: '#0ea5e9' },
+    { label: 'Offers', value: totals.offers, icon: DashboardIcon, accent: '#059669' },
+    { label: 'Success rate', value: `${success_rate}%`, icon: CheckSquareIcon, accent: '#d97706' },
   ];
 
   return (
@@ -42,8 +43,8 @@ export function DashboardPage() {
       </div>
 
       <div className="stat-grid">
-        {stats.map(({ label, value, icon: Icon }) => (
-          <div key={label} className="stat-card">
+        {stats.map(({ label, value, icon: Icon, accent }) => (
+          <div key={label} className="stat-card" style={{ '--accent': accent } as CSSProperties}>
             <span className="stat-icon">
               <Icon width={20} height={20} />
             </span>
