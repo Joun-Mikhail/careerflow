@@ -8,6 +8,7 @@ envelope documented in ``docs/04-api-design.md``.
 
 from __future__ import annotations
 
+import time
 from collections.abc import Awaitable, Callable
 
 from fastapi import FastAPI, Request
@@ -17,14 +18,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from sqlalchemy import text
 
+from app import __version__
 from app.core.config import get_settings
+from app.core.database import engine
 from app.core.errors import DomainError
 from app.core.logging import configure_logging, get_logger
 from app.core.ratelimit import limiter
 
 settings = get_settings()
 logger = get_logger("app.main")
+
+#: Process start time, for the health endpoint's uptime metric.
+_STARTED_AT = time.monotonic()
 
 
 def _error_body(code: str, message: str, details: object | None = None) -> dict[str, object]:
@@ -130,8 +137,25 @@ def _configure_routes(app: FastAPI) -> None:
     from app.api.router import api_router
 
     @app.get("/health", tags=["system"], summary="Liveness/readiness probe")
-    def health() -> dict[str, str]:
-        return {"status": "ok"}
+    def health(response: Response) -> dict[str, object]:
+        """Report database connectivity, app version, and uptime.
+
+        Returns 503 when the database is unreachable so orchestrators don't
+        route traffic to an instance that can't serve requests.
+        """
+        database = "connected"
+        try:
+            with engine.connect() as conn:
+                conn.execute(text("SELECT 1"))
+        except Exception:  # pragma: no cover - exercised only when the DB is down
+            database = "error"
+            response.status_code = 503
+        return {
+            "status": "ok" if database == "connected" else "degraded",
+            "version": __version__,
+            "uptime_seconds": round(time.monotonic() - _STARTED_AT, 1),
+            "database": database,
+        }
 
     app.include_router(api_router, prefix=settings.api_v1_prefix)
 
