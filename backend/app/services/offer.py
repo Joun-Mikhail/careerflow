@@ -7,6 +7,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.core.errors import ensure_found
+from app.core.logging import log_action
 from app.core.pagination import Page, PageParams
 from app.models.enums import OfferDecision
 from app.models.offer import Offer
@@ -42,16 +43,33 @@ class OfferService:
     def create(self, owner: User, application_id: UUID, data: OfferCreate) -> Offer:
         self._ensure_application_owned(owner, application_id)
         offer = Offer(user_id=owner.id, application_id=application_id, **data.model_dump())
-        return self.repo.add(offer)
+        self.repo.add(offer)
+        log_action(
+            "offer_decision",
+            status="created",
+            user_id=owner.id,
+            offer_id=str(offer.id),
+            decision=offer.decision.value,
+        )
+        return offer
 
     def get(self, owner: User, offer_id: UUID) -> Offer:
         return ensure_found(self.repo.get(owner.id, offer_id), "Offer not found.")
 
     def update(self, owner: User, offer_id: UUID, data: OfferUpdate) -> Offer:
         offer = self.get(owner, offer_id)
-        for field, value in data.model_dump(exclude_unset=True).items():
+        changes = data.model_dump(exclude_unset=True)
+        for field, value in changes.items():
             setattr(offer, field, value)
         self.repo.flush()
+        if "decision" in changes:
+            log_action(
+                "offer_decision",
+                status="updated",
+                user_id=owner.id,
+                offer_id=str(offer.id),
+                decision=offer.decision.value,
+            )
         return offer
 
     def delete(self, owner: User, offer_id: UUID) -> None:

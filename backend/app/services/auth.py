@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.errors import AuthenticationError, ConflictError
+from app.core.logging import log_action
 from app.core.security import (
     create_access_token,
     create_refresh_token,
@@ -54,23 +55,29 @@ class AuthService:
         """
         user = self.users.get_by_email(email)
         if user is None or not verify_password(password, user.hashed_password):
+            log_action("login", status="failure", user_id=user.id if user else None)
             raise AuthenticationError("Invalid email or password.")
         if not user.is_active:
+            log_action("login", status="failure", user_id=user.id)
             raise AuthenticationError("Invalid email or password.")
+        log_action("login", status="success", user_id=user.id)
         return self._auth_response(user)
 
     def update_profile(self, user: User, full_name: str | None) -> User:
         """Update the user's editable profile fields."""
         user.full_name = full_name
         self.users.flush()
+        log_action("profile_update", status="success", user_id=user.id)
         return user
 
     def change_password(self, user: User, current_password: str, new_password: str) -> None:
         """Change the password after verifying the current one."""
         if not verify_password(current_password, user.hashed_password):
+            log_action("password_change", status="failure", user_id=user.id)
             raise AuthenticationError("Current password is incorrect.")
         user.hashed_password = hash_password(new_password)
         self.users.flush()
+        log_action("password_change", status="success", user_id=user.id)
 
     def refresh(self, refresh_token: str) -> AuthResponse:
         """Exchange a valid refresh token for a fresh, rotated token pair."""
