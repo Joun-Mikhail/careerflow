@@ -38,10 +38,26 @@ def _error_body(code: str, message: str, details: object | None = None) -> dict[
     return {"error": {"code": code, "message": message, "details": details}}
 
 
+def _init_sentry() -> None:
+    """Initialise Sentry error reporting when a DSN is configured (else no-op)."""
+    if not settings.sentry_dsn:
+        return
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        environment=settings.environment,
+        traces_sample_rate=0.1,
+        send_default_pii=False,
+    )
+    logger.info("Sentry error reporting enabled")
+
+
 def create_app() -> FastAPI:
     """Build and configure the FastAPI application."""
     configure_logging(debug=settings.debug)
     settings.validate_for_runtime()
+    _init_sentry()
 
     app = FastAPI(
         title=settings.project_name,

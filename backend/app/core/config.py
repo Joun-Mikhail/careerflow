@@ -61,6 +61,9 @@ class Settings(BaseSettings):
         default_factory=lambda: ["http://localhost:5173"], alias="CORS_ORIGINS"
     )
 
+    # --- Observability -----------------------------------------------------
+    sentry_dsn: str | None = Field(default=None, alias="SENTRY_DSN")
+
     # --- Uploads -----------------------------------------------------------
     upload_dir: str = Field(default="var/uploads", alias="UPLOAD_DIR")
     max_upload_size_bytes: int = Field(default=5 * 1024 * 1024, alias="MAX_UPLOAD_SIZE_BYTES")

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 
@@ -23,7 +24,8 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
-    // Hook for monitoring; Sentry's own boundary also captures these.
+    // Report to Sentry (a no-op when no DSN is configured) and log locally.
+    Sentry.captureException(error, { extra: { componentStack: info.componentStack } });
     console.error('Unhandled UI error:', error, info.componentStack);
   }
 

@@ -10,6 +10,9 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import './index.css';
 import { queryClient } from './lib/queryClient';
+import { initSentry } from './lib/sentry';
+
+initSentry();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Root element #root not found');
