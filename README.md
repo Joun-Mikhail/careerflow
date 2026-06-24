@@ -99,7 +99,9 @@ It then launches in its own window, works offline for the shell, and shows up al
 - 📝 **Notes** — Markdown notes per application.
 - 📎 **Attachments** — secure resume/cover-letter uploads (validated, owner-only download).
 - 📊 **Dashboard & analytics** — headline stats, upcoming interviews, pending tasks, and Recharts visualizations (applications over time, status & industry distribution, conversion rates).
+- 📤 **CSV export** — download your whole pipeline as an RFC-4180 CSV (Excel/Sheets-ready) in one click.
 - ⚙️ **Settings** — update your profile and change your password.
+- 📱 **Installable PWA + mobile UI** — install to a phone/desktop home screen; on small screens the sidebar becomes a slide-in drawer.
 - 🌗 **Polished UX** — responsive layout, light/dark themes, Zod-validated forms, and proper loading / empty / error states throughout.
 
 ## Screenshots
@@ -110,13 +112,18 @@ It then launches in its own window, works offline for the shell, and shows up al
   <img src="docs/screenshots/demo.gif" alt="CareerFlow walkthrough: dashboard, pipeline board, application detail, tasks, analytics" width="780" />
 </p>
 
-| Pipeline board | Application detail |
+| Dashboard | Pipeline board |
 | --- | --- |
-| <img src="docs/screenshots/applications-board.png" alt="Kanban pipeline board" /> | <img src="docs/screenshots/application-detail.png" alt="Application detail with interviews, notes, attachments" /> |
+| <img src="docs/screenshots/dashboard.png" alt="Dashboard with headline stats, upcoming interviews and pending tasks" /> | <img src="docs/screenshots/applications-board.png" alt="Kanban pipeline board" /> |
+| **Application detail** | **Analytics** |
+| <img src="docs/screenshots/application-detail.png" alt="Application detail with interviews, notes, attachments" /> | <img src="docs/screenshots/analytics.png" alt="Analytics charts" /> |
 | **Offers** | **Interviews** |
 | <img src="docs/screenshots/offers.png" alt="Offers with salary, bonus, and decision status" /> | <img src="docs/screenshots/interviews.png" alt="Global interviews list" /> |
-| **Analytics** | **Light theme** |
-| <img src="docs/screenshots/analytics.png" alt="Analytics charts" /> | <img src="docs/screenshots/dashboard-light.png" alt="Dashboard in light mode" /> |
+
+<p align="center">
+  <img src="docs/screenshots/mobile-dashboard.png" alt="CareerFlow on mobile with the slide-in navigation drawer" width="300" />
+</p>
+<p align="center"><sub>On phones the sidebar collapses into a slide-in drawer — the app installs to your home screen as a PWA.</sub></p>
 
 ## Tech stack
 

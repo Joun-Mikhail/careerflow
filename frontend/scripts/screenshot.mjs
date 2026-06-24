@@ -41,13 +41,15 @@ async function main() {
       console.log(`captured ${name}.png`);
     };
 
-    // 1. Login screen (form is pre-filled with demo credentials).
+    // 1. Login screen.
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'load' });
     await page.waitForSelector('.auth-card');
     await wait(400);
     await shot('login');
 
-    // Sign in and land on the dashboard.
+    // Sign in with the demo account and land on the dashboard.
+    await page.type('#email', 'demo@careerflow.app');
+    await page.type('#password', 'DemoPass123!');
     await page.click('button[type="submit"]');
     await page.waitForFunction(() => window.location.pathname === '/', { timeout: 15000 });
     await page.waitForSelector('.stat-value');
@@ -96,6 +98,15 @@ async function main() {
     await page.waitForSelector('.page-title');
     await wait(700);
     await shot('settings');
+
+    // 8. Mobile view with the navigation drawer open (phone viewport).
+    await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'load' });
+    await page.waitForSelector('.stat-value');
+    await wait(600);
+    await page.click('.nav-toggle');
+    await wait(500);
+    await shot('mobile-dashboard');
   } finally {
     await browser.close();
   }
