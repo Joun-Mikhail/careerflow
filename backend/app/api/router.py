@@ -9,6 +9,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from app.api.v1 import (
+    ai,
     analytics,
     applications,
     attachments,
@@ -35,7 +36,8 @@ api_router.include_router(attachments.router)
 api_router.include_router(offers.router)
 api_router.include_router(dashboard.router)
 api_router.include_router(analytics.router)
-# Smart job-search: document vault.
+# Smart job-search: document vault + AI.
 api_router.include_router(cvs.router)
 api_router.include_router(certificates.router)
 api_router.include_router(skills.router)
+api_router.include_router(ai.router)

@@ -75,6 +75,18 @@ class Settings(BaseSettings):
     # --- Observability -----------------------------------------------------
     sentry_dsn: str | None = Field(default=None, alias="SENTRY_DSN")
 
+    # --- AI (CV tailoring) -------------------------------------------------
+    # When an OpenAI key is set, CV tailoring uses the model below. Without a
+    # key the app falls back to a deterministic stub so the feature works
+    # end-to-end in development and tests without external calls or cost.
+    openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
+    openai_model: str = Field(default="gpt-4o-mini", alias="OPENAI_MODEL")
+
+    @property
+    def ai_enabled(self) -> bool:
+        """True when a real AI provider (OpenAI) is configured."""
+        return bool(self.openai_api_key)
+
     # --- Uploads -----------------------------------------------------------
     upload_dir: str = Field(default="var/uploads", alias="UPLOAD_DIR")
     max_upload_size_bytes: int = Field(default=5 * 1024 * 1024, alias="MAX_UPLOAD_SIZE_BYTES")
