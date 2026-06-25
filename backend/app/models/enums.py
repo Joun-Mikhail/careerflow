@@ -54,3 +54,44 @@ class OfferDecision(StrEnum):
     NEGOTIATING = "negotiating"
     ACCEPTED = "accepted"
     DECLINED = "declined"
+
+
+# --- Smart job-search feature ------------------------------------------------
+
+
+class CvSource(StrEnum):
+    """How a stored CV came to exist."""
+
+    UPLOADED = "uploaded"
+    AI_TAILORED = "ai_tailored"
+
+
+class SkillProficiency(StrEnum):
+    BEGINNER = "beginner"
+    INTERMEDIATE = "intermediate"
+    ADVANCED = "advanced"
+    EXPERT = "expert"
+
+
+class SourcedApplicationStatus(StrEnum):
+    """Lifecycle of an application created from an externally sourced job.
+
+    Kept separate from :class:`ApplicationStatus` (the manual pipeline) because
+    sourced applications start at ``saved`` and never sit in a wishlist.
+    """
+
+    SAVED = "saved"
+    APPLIED = "applied"
+    INTERVIEWING = "interviewing"
+    REJECTED = "rejected"
+    OFFER = "offer"
+    ACCEPTED = "accepted"
+    WITHDRAWN = "withdrawn"
+
+
+class RunFrequency(StrEnum):
+    """How often an automation rule should run."""
+
+    MANUAL = "manual"
+    DAILY = "daily"
+    WEEKLY = "weekly"
