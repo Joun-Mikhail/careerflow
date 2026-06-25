@@ -35,4 +35,7 @@ export const queryKeys = {
   offersForApplication: (applicationId: string) => ['offers', 'app', applicationId] as const,
   tasks: (params?: unknown) => ['tasks', params] as const,
   analytics: ['analytics'] as const,
+  cvs: ['cvs'] as const,
+  certificates: ['certificates'] as const,
+  skills: ['skills'] as const,
 };

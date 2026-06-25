@@ -50,6 +50,14 @@ export const MenuIcon = (p: IconProps) => (
   </svg>
 );
 
+export const FileTextIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <path d="M14 2v6h6" />
+    <path d="M8 13h8M8 17h8M8 9h2" />
+  </svg>
+);
+
 export const DownloadIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
