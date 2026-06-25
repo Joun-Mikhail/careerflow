@@ -16,15 +16,21 @@ class TailorCvRequest(BaseModel):
 
     cv_id: UUID | None = None
     cv_text: str | None = Field(default=None, max_length=50_000)
-    job_description: str = Field(min_length=20, max_length=50_000)
+    # Provide the target job either inline (job_description) or by job_id
+    # (uses the fetched job's description). job_description wins when both given.
+    job_description: str | None = Field(default=None, max_length=50_000)
+    job_id: UUID | None = None
     include_cover_letter: bool = False
     # When set, the tailored result is saved as a new CV with this title.
     save_as_title: str | None = Field(default=None, min_length=1, max_length=200)
 
     @model_validator(mode="after")
-    def _require_a_base(self) -> TailorCvRequest:
+    def _require_inputs(self) -> TailorCvRequest:
         if self.cv_id is None and not (self.cv_text and self.cv_text.strip()):
             raise ValueError("Provide either cv_id or cv_text as the base CV.")
+        has_description = bool(self.job_description and self.job_description.strip())
+        if not has_description and self.job_id is None:
+            raise ValueError("Provide either job_description or job_id.")
         return self
 
 

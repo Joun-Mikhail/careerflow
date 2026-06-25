@@ -87,6 +87,18 @@ class Settings(BaseSettings):
         """True when a real AI provider (OpenAI) is configured."""
         return bool(self.openai_api_key)
 
+    # --- Job sources (Adzuna) ----------------------------------------------
+    # With Adzuna credentials, job search hits the real API; otherwise a
+    # deterministic mock provider returns sample postings so the flow works
+    # end-to-end without keys.
+    adzuna_app_id: str | None = Field(default=None, alias="ADZUNA_APP_ID")
+    adzuna_app_key: str | None = Field(default=None, alias="ADZUNA_APP_KEY")
+    adzuna_country: str = Field(default="gb", alias="ADZUNA_COUNTRY")
+
+    @property
+    def adzuna_enabled(self) -> bool:
+        return bool(self.adzuna_app_id and self.adzuna_app_key)
+
     # --- Uploads -----------------------------------------------------------
     upload_dir: str = Field(default="var/uploads", alias="UPLOAD_DIR")
     max_upload_size_bytes: int = Field(default=5 * 1024 * 1024, alias="MAX_UPLOAD_SIZE_BYTES")
