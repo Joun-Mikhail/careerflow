@@ -100,6 +100,9 @@ It then launches in its own window, works offline for the shell, and shows up al
 - 📎 **Attachments** — secure resume/cover-letter uploads (validated, owner-only download).
 - 📊 **Dashboard & analytics** — headline stats, upcoming interviews, pending tasks, and Recharts visualizations (applications over time, status & industry distribution, conversion rates).
 - 📤 **CSV export** — download your whole pipeline as an RFC-4180 CSV (Excel/Sheets-ready) in one click.
+- 📁 **Document vault** — store multiple CVs (PDF/DOCX), certificates, and skills; durable object storage (Cloudflare R2 / S3) with a local-disk fallback.
+- ✨ **AI CV tailoring** — rewrite a CV (and optional cover letter) for a specific job via OpenAI (gpt-4o-mini), saved as a new versioned CV. Falls back to an offline stub with no API key.
+- 🔎 **Job search** — save search filters and fetch matching jobs from Adzuna (with a mock provider when no keys are set); tailor a CV straight from a fetched job.
 - ⚙️ **Settings** — update your profile and change your password.
 - 📱 **Installable PWA + mobile UI** — install to a phone/desktop home screen; on small screens the sidebar becomes a slide-in drawer.
 - 🌗 **Polished UX** — responsive layout, light/dark themes, Zod-validated forms, and proper loading / empty / error states throughout.
