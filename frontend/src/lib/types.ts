@@ -16,6 +16,86 @@ export type TaskPriority = 'low' | 'medium' | 'high';
 export type AttachmentKind = 'resume' | 'cover_letter' | 'other';
 export type OfferDecision = 'pending' | 'negotiating' | 'accepted' | 'declined';
 
+// --- Smart job-search: document vault ---
+export type CvSource = 'uploaded' | 'ai_tailored';
+export type SkillProficiency = 'beginner' | 'intermediate' | 'advanced' | 'expert';
+
+export interface Cv {
+  id: string;
+  title: string;
+  source: CvSource;
+  is_default: boolean;
+  original_filename: string | null;
+  content_type: string | null;
+  size_bytes: number | null;
+  parent_cv_id: string | null;
+  job_id: string | null;
+  has_file: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Certificate {
+  id: string;
+  name: string;
+  issuer: string | null;
+  issued_on: string | null;
+  credential_url: string | null;
+  original_filename: string | null;
+  content_type: string | null;
+  size_bytes: number | null;
+  has_file: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Skill {
+  id: string;
+  name: string;
+  category: string | null;
+  proficiency: SkillProficiency | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TailorCvResult {
+  tailored_cv: string;
+  cover_letter: string | null;
+  provider: string;
+  saved_cv_id: string | null;
+}
+
+export interface JobSearchFilter {
+  id: string;
+  name: string;
+  title_keywords: string | null;
+  locations: string | null;
+  keywords: string | null;
+  remote: boolean;
+  salary_min: number | null;
+  salary_max: number | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Job {
+  id: string;
+  source: string;
+  external_id: string;
+  title: string;
+  company: string | null;
+  location: string | null;
+  description: string | null;
+  url: string;
+  salary_min: number | null;
+  salary_max: number | null;
+  remote: boolean;
+  posted_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface User {
   id: string;
   email: string;

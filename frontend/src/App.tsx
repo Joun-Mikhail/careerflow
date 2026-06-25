@@ -9,7 +9,9 @@ import { ApplicationDetailPage } from './pages/ApplicationDetailPage';
 import { ApplicationsPage } from './pages/ApplicationsPage';
 import { CompaniesPage } from './pages/CompaniesPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { DocumentsPage } from './pages/DocumentsPage';
 import { InterviewsPage } from './pages/InterviewsPage';
+import { JobSearchPage } from './pages/JobSearchPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { OffersPage } from './pages/OffersPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -57,6 +59,8 @@ export default function App() {
         <Route path="/applications/:id" element={<ApplicationDetailPage />} />
         <Route path="/interviews" element={<InterviewsPage />} />
         <Route path="/companies" element={<CompaniesPage />} />
+        <Route path="/documents" element={<DocumentsPage />} />
+        <Route path="/job-search" element={<JobSearchPage />} />
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/offers" element={<OffersPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
