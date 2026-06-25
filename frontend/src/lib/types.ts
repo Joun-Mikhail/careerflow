@@ -58,6 +58,13 @@ export interface Skill {
   updated_at: string;
 }
 
+export interface TailorCvResult {
+  tailored_cv: string;
+  cover_letter: string | null;
+  provider: string;
+  saved_cv_id: string | null;
+}
+
 export interface User {
   id: string;
   email: string;

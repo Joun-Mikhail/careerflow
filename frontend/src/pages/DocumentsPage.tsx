@@ -4,6 +4,7 @@ import type { FormEvent } from 'react';
 import { EmptyState, ErrorState } from '@/components/feedback/States';
 import { TableSkeleton } from '@/components/feedback/Skeletons';
 import { DownloadIcon, FileTextIcon, PlusIcon, TrashIcon } from '@/components/icons';
+import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/contexts/ToastContext';
 import {
   useCertificates,
@@ -14,11 +15,12 @@ import {
   useDeleteCv,
   useDeleteSkill,
   useSkills,
+  useTailorCv,
   useUpdateCv,
   useUploadCv,
 } from '@/hooks/useDocuments';
 import { formatBytes, formatDate, titleCase } from '@/lib/format';
-import type { SkillProficiency } from '@/lib/types';
+import type { Cv, SkillProficiency, TailorCvResult } from '@/lib/types';
 import { ApiError } from '@/services/api';
 import { cvsApi, downloadFile } from '@/services/documents';
 
@@ -77,6 +79,7 @@ function CvsTab() {
   const remove = useDeleteCv();
   const fileRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState('');
+  const [tailorOpen, setTailorOpen] = useState(false);
 
   async function handleUpload(event: FormEvent) {
     event.preventDefault();
@@ -115,6 +118,13 @@ function CvsTab() {
           </button>
         </div>
       </form>
+
+      <div className="toolbar">
+        <span className="muted">Tailor a CV to a specific job with AI.</span>
+        <button className="btn btn-secondary" onClick={() => setTailorOpen(true)}>
+          ✦ Tailor with AI
+        </button>
+      </div>
 
       <div className="card">
         {isLoading ? (
@@ -176,7 +186,125 @@ function CvsTab() {
           </div>
         )}
       </div>
+
+      <TailorCvModal cvs={cvs} open={tailorOpen} onClose={() => setTailorOpen(false)} />
     </>
+  );
+}
+
+// --- AI tailoring modal ------------------------------------------------------
+
+function TailorCvModal({ cvs, open, onClose }: { cvs: Cv[]; open: boolean; onClose: () => void }) {
+  const toast = useToast();
+  const tailor = useTailorCv();
+  const textCvs = cvs.filter((c) => !c.has_file); // only text-based CVs can be tailored
+  const [cvId, setCvId] = useState('');
+  const [cvText, setCvText] = useState('');
+  const [jobDescription, setJobDescription] = useState('');
+  const [includeCover, setIncludeCover] = useState(false);
+  const [result, setResult] = useState<TailorCvResult | null>(null);
+  const [saveTitle, setSaveTitle] = useState('');
+
+  function reset() {
+    setResult(null);
+    setSaveTitle('');
+  }
+
+  async function handleGenerate(save: boolean) {
+    if (jobDescription.trim().length < 20) {
+      toast.error('Paste a job description (at least 20 characters).');
+      return;
+    }
+    if (!cvId && cvText.trim().length === 0) {
+      toast.error('Pick a text CV or paste your CV text.');
+      return;
+    }
+    try {
+      const res = await tailor.mutateAsync({
+        cv_id: cvId || undefined,
+        cv_text: cvText.trim() || undefined,
+        job_description: jobDescription,
+        include_cover_letter: includeCover,
+        save_as_title: save ? saveTitle || 'Tailored CV' : undefined,
+      });
+      setResult(res);
+      if (save && res.saved_cv_id) {
+        toast.success('Saved as a new CV.');
+        onClose();
+        reset();
+      }
+    } catch (err) {
+      toast.error(errorMessage(err, 'Tailoring failed.'));
+    }
+  }
+
+  return (
+    <Modal open={open} title="Tailor a CV with AI" onClose={onClose}>
+      <div className="stack" style={{ gap: 'var(--space-3)' }}>
+        {textCvs.length > 0 && (
+          <div className="field">
+            <label className="label" htmlFor="tailor-cv">Base CV (text-based)</label>
+            <select id="tailor-cv" className="input" value={cvId}
+              onChange={(e) => setCvId(e.target.value)}>
+              <option value="">— Paste text instead —</option>
+              {textCvs.map((c) => (
+                <option key={c.id} value={c.id}>{c.title}</option>
+              ))}
+            </select>
+          </div>
+        )}
+        {!cvId && (
+          <div className="field">
+            <label className="label" htmlFor="tailor-text">Your CV text</label>
+            <textarea id="tailor-text" className="input" rows={5} value={cvText}
+              placeholder="Paste your CV here (uploaded PDFs/DOCX can't be auto-read yet)."
+              onChange={(e) => setCvText(e.target.value)} />
+          </div>
+        )}
+        <div className="field">
+          <label className="label" htmlFor="tailor-job">Job description</label>
+          <textarea id="tailor-job" className="input" rows={5} value={jobDescription}
+            placeholder="Paste the job description you're targeting."
+            onChange={(e) => setJobDescription(e.target.value)} />
+        </div>
+        <label className="row" style={{ gap: 8 }}>
+          <input type="checkbox" checked={includeCover}
+            onChange={(e) => setIncludeCover(e.target.checked)} />
+          Also write a cover letter
+        </label>
+
+        <button className="btn btn-primary" disabled={tailor.isPending}
+          onClick={() => handleGenerate(false)}>
+          {tailor.isPending ? 'Generating…' : '✦ Generate'}
+        </button>
+
+        {result && (
+          <div className="stack" style={{ gap: 'var(--space-3)' }}>
+            <div className="field">
+              <label className="label">Tailored CV <span className="subtle">· via {result.provider}</span></label>
+              <textarea className="input" rows={8} readOnly value={result.tailored_cv} />
+            </div>
+            {result.cover_letter && (
+              <div className="field">
+                <label className="label">Cover letter</label>
+                <textarea className="input" rows={6} readOnly value={result.cover_letter} />
+              </div>
+            )}
+            <div className="row" style={{ gap: 'var(--space-2)', alignItems: 'flex-end' }}>
+              <div className="field" style={{ flex: 1 }}>
+                <label className="label" htmlFor="save-title">Save as new CV titled</label>
+                <input id="save-title" className="input" value={saveTitle}
+                  placeholder="e.g. Tailored — Acme Backend" onChange={(e) => setSaveTitle(e.target.value)} />
+              </div>
+              <button className="btn btn-primary" disabled={tailor.isPending}
+                onClick={() => handleGenerate(true)}>
+                Save as new CV
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </Modal>
   );
 }
 

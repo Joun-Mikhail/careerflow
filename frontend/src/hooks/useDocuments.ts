@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { queryKeys } from '@/lib/queryClient';
+import { aiApi, type TailorCvInput } from '@/services/ai';
 import {
   certificatesApi,
   cvsApi,
@@ -82,5 +83,18 @@ export function useDeleteSkill() {
   return useMutation({
     mutationFn: (id: string) => skillsApi.remove(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.skills }),
+  });
+}
+
+// --- AI tailoring ------------------------------------------------------------
+
+export function useTailorCv() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: TailorCvInput) => aiApi.tailorCv(input),
+    // A saved tailored CV becomes a new CV — refresh the list.
+    onSuccess: (result) => {
+      if (result.saved_cv_id) qc.invalidateQueries({ queryKey: queryKeys.cvs });
+    },
   });
 }
