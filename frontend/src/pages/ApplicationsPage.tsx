@@ -1,14 +1,25 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ApplicationForm } from '@/components/forms/ApplicationForm';
 import { EmptyState, ErrorState } from '@/components/feedback/States';
 import { BoardSkeleton, TableSkeleton } from '@/components/feedback/Skeletons';
-import { BriefcaseIcon, DownloadIcon, MapPinIcon, PlusIcon, SearchIcon } from '@/components/icons';
+import {
+  BriefcaseIcon,
+  DownloadIcon,
+  ExternalLinkIcon,
+  MapPinIcon,
+  PlusIcon,
+  SearchIcon,
+} from '@/components/icons';
 import { StatusBadge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/contexts/ToastContext';
-import { useApplications, useCreateApplication } from '@/hooks/useApplications';
+import {
+  useApplications,
+  useCreateApplication,
+  useImportApplicationFromUrl,
+} from '@/hooks/useApplications';
 import { useCompanies } from '@/hooks/useCompanies';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { PIPELINE_STATUSES } from '@/lib/constants';
@@ -28,6 +39,9 @@ export function ApplicationsPage() {
   const debouncedSearch = useDebouncedValue(search, 300);
   const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importUrl, setImportUrl] = useState('');
+  const [importError, setImportError] = useState<string | null>(null);
 
   const { data, isLoading, isError, refetch } = useApplications({
     q: debouncedSearch || undefined,
@@ -35,6 +49,7 @@ export function ApplicationsPage() {
   });
   const { data: companyData } = useCompanies({ page_size: 100, sort: 'name', order: 'asc' });
   const createApplication = useCreateApplication();
+  const importApplication = useImportApplicationFromUrl();
 
   const companies = useMemo(() => companyData?.items ?? [], [companyData]);
   const companyName = useMemo(() => {
@@ -60,6 +75,35 @@ export function ApplicationsPage() {
       setCreating(false);
     } catch (err) {
       setFormError(err instanceof ApiError ? err.message : 'Could not create application.');
+    }
+  }
+
+  function openImport() {
+    setImportUrl('');
+    setImportError(null);
+    setImporting(true);
+  }
+
+  async function handleImport(event: FormEvent) {
+    event.preventDefault();
+    setImportError(null);
+    const url = importUrl.trim();
+    if (!/^https?:\/\//i.test(url)) {
+      setImportError('Paste a full http(s) URL.');
+      return;
+    }
+    try {
+      const result = await importApplication.mutateAsync({ url });
+      setImporting(false);
+      const role = result.application.role_title;
+      toast.success(`Imported "${role}" from ${result.extracted.source ?? 'the URL'}.`);
+      navigate(`/applications/${result.application.id}`);
+    } catch (err) {
+      setImportError(
+        err instanceof ApiError
+          ? err.message
+          : "Couldn't read that job posting — try adding it manually.",
+      );
     }
   }
 
@@ -110,6 +154,9 @@ export function ApplicationsPage() {
             disabled={applications.length === 0}
           >
             <DownloadIcon width={16} height={16} /> Export CSV
+          </button>
+          <button className="btn btn-secondary" onClick={openImport}>
+            <ExternalLinkIcon width={16} height={16} /> Import from URL
           </button>
           <button className="btn btn-primary" onClick={() => setCreating(true)}>
             <PlusIcon /> Add application
@@ -245,6 +292,54 @@ export function ApplicationsPage() {
           onSubmit={handleCreate}
           onCancel={() => setCreating(false)}
         />
+      </Modal>
+
+      <Modal
+        open={importing}
+        title="Import application from URL"
+        onClose={() => setImporting(false)}
+      >
+        <form onSubmit={handleImport} className="col" style={{ gap: 'var(--space-3)' }}>
+          <p className="subtle" style={{ margin: 0 }}>
+            Paste a job posting link (Greenhouse, Lever, LinkedIn, Indeed, Workday, Ashby…) and
+            we'll pull the title, company, location, salary, and description into a new
+            application.
+          </p>
+          <label className="col" style={{ gap: 4 }}>
+            <span className="label">Job URL</span>
+            <input
+              autoFocus
+              type="url"
+              className="input"
+              placeholder="https://boards.greenhouse.io/acme/jobs/123"
+              value={importUrl}
+              onChange={(e) => setImportUrl(e.target.value)}
+              required
+            />
+          </label>
+          {importError && (
+            <div className="form-error" role="alert">
+              {importError}
+            </div>
+          )}
+          <div className="row" style={{ justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setImporting(false)}
+              disabled={importApplication.isPending}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={importApplication.isPending}
+            >
+              {importApplication.isPending ? 'Importing…' : 'Import'}
+            </button>
+          </div>
+        </form>
       </Modal>
     </>
   );

@@ -1,0 +1,6 @@
+git_url(ENV["MATCH_GIT_URL"])
+storage_mode("git")
+type("appstore")
+app_identifier(["com.careerflow.app"])
+username(ENV["FASTLANE_USER"])
+team_id(ENV["APPLE_TEAM_ID"])

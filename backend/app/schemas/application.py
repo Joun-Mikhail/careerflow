@@ -76,3 +76,32 @@ class ApplicationRead(IdentifiedModel):
     application_url: str | None
     source: str | None
     applied_at: datetime | None
+
+
+class ApplicationImportFromUrl(BaseModel):
+    """Payload for ``POST /applications/import-from-url``."""
+
+    url: str = Field(min_length=8, max_length=1000)
+    status: ApplicationStatus = ApplicationStatus.WISHLIST
+    create_company: bool = True
+
+
+class ApplicationImportPreview(BaseModel):
+    """Fields extracted from the URL, returned alongside the created application."""
+
+    role_title: str | None = None
+    company_name: str | None = None
+    location: str | None = None
+    is_remote: bool = False
+    salary_min: int | None = None
+    salary_max: int | None = None
+    salary_currency: str | None = None
+    description: str | None = None
+    source: str | None = None
+
+
+class ApplicationImportResult(BaseModel):
+    """Result of an import: the created application plus what was extracted."""
+
+    application: ApplicationRead
+    extracted: ApplicationImportPreview

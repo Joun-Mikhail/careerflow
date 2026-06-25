@@ -2,7 +2,22 @@
 
 from __future__ import annotations
 
+import pytest
 from fastapi.testclient import TestClient
+
+_SAMPLE_JOB_HTML = """
+<html><head>
+<title>Backend Engineer at Globex</title>
+<script type="application/ld+json">
+{"@type":"JobPosting","title":"Backend Engineer",
+ "description":"Build APIs",
+ "hiringOrganization":{"name":"Globex"},
+ "jobLocation":{"@type":"Place","address":{"addressLocality":"Remote"}},
+ "jobLocationType":"TELECOMMUTE",
+ "baseSalary":{"currency":"USD","value":{"minValue":120000,"maxValue":150000}}}
+</script>
+</head><body></body></html>
+"""
 
 
 def _create_company(client: TestClient, headers: dict[str, str], name: str = "Acme") -> str:
@@ -134,3 +149,93 @@ def test_applications_scoped_to_owner(client: TestClient, auth_headers: dict[str
     other_headers = {"Authorization": f"Bearer {other['token']['access_token']}"}
     body = client.get("/api/v1/applications", headers=other_headers).json()
     assert body["total"] == 0
+
+
+def test_import_from_url_creates_application_and_company(
+    client: TestClient,
+    auth_headers: dict[str, str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Bypass the network: stub the extractor used by the import service.
+    from app.services import application as application_service
+
+    monkeypatch.setattr(
+        application_service,
+        "extract_from_url",
+        lambda url, *, fetcher=None: _extracted_sample(url),
+    )
+
+    response = client.post(
+        "/api/v1/applications/import-from-url",
+        json={"url": "https://boards.greenhouse.io/globex/jobs/42"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 201, response.text
+    body = response.json()
+    assert body["extracted"]["role_title"] == "Backend Engineer"
+    assert body["extracted"]["company_name"] == "Globex"
+    assert body["application"]["role_title"] == "Backend Engineer"
+    assert body["application"]["is_remote"] is True
+    assert body["application"]["salary_min"] == 120000
+    assert body["application"]["source"] == "Greenhouse"
+    # Company was auto-created and linked.
+    assert body["application"]["company_id"] is not None
+
+    # Re-importing the same company name reuses the existing record.
+    second = client.post(
+        "/api/v1/applications/import-from-url",
+        json={"url": "https://boards.greenhouse.io/globex/jobs/43"},
+        headers=auth_headers,
+    )
+    assert second.status_code == 201
+    assert second.json()["application"]["company_id"] == body["application"]["company_id"]
+
+
+def test_import_from_url_rejects_when_no_title_found(
+    client: TestClient,
+    auth_headers: dict[str, str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from app.services import application as application_service
+    from app.services.url_import import ExtractedJob
+
+    def _empty(url: str, *, fetcher=None) -> ExtractedJob:
+        return ExtractedJob(
+            role_title=None,
+            company_name=None,
+            location=None,
+            is_remote=False,
+            salary_min=None,
+            salary_max=None,
+            salary_currency=None,
+            description=None,
+            application_url=url,
+            source=None,
+            posted_at=None,
+        )
+
+    monkeypatch.setattr(application_service, "extract_from_url", _empty)
+
+    response = client.post(
+        "/api/v1/applications/import-from-url",
+        json={"url": "https://example.com/jobs/x"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 422
+
+
+def test_import_from_url_rejects_non_http_scheme(
+    client: TestClient, auth_headers: dict[str, str]
+) -> None:
+    response = client.post(
+        "/api/v1/applications/import-from-url",
+        json={"url": "file:///etc/passwd"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 422
+
+
+def _extracted_sample(url: str):
+    from app.services.url_import import extract_from_html
+
+    return extract_from_html(_SAMPLE_JOB_HTML, source_url=url)

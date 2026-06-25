@@ -26,6 +26,29 @@ export interface ApplicationListParams {
   order?: 'asc' | 'desc';
 }
 
+export interface ImportFromUrlInput {
+  url: string;
+  status?: ApplicationStatus;
+  create_company?: boolean;
+}
+
+export interface ImportPreview {
+  role_title: string | null;
+  company_name: string | null;
+  location: string | null;
+  is_remote: boolean;
+  salary_min: number | null;
+  salary_max: number | null;
+  salary_currency: string | null;
+  description: string | null;
+  source: string | null;
+}
+
+export interface ImportResult {
+  application: Application;
+  extracted: ImportPreview;
+}
+
 export const applicationsApi = {
   list: (params: ApplicationListParams = {}) =>
     api.get<Page<Application>>('/applications', { params }).then((r) => r.data),
@@ -35,4 +58,6 @@ export const applicationsApi = {
   update: (id: string, input: Partial<ApplicationInput>) =>
     api.patch<Application>(`/applications/${id}`, input).then((r) => r.data),
   remove: (id: string) => api.delete(`/applications/${id}`).then(() => undefined),
+  importFromUrl: (input: ImportFromUrlInput) =>
+    api.post<ImportResult>('/applications/import-from-url', input).then((r) => r.data),
 };

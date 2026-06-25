@@ -21,7 +21,9 @@
     "cap:open:android": "cap open android",
     "cap:open:ios": "cap open ios",
     "cap:add:android": "cap add android",
-    "cap:add:ios": "cap add ios"
+    "cap:add:ios": "cap add ios",
+    "generate:icon": "node scripts/generate-icon.mjs",
+    "generate:screenshots": "node scripts/store-screenshots.mjs appstore"
   },
   "dependencies": {
     "@sentry/react": "^10.60.0",
