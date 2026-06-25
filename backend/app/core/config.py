@@ -79,6 +79,20 @@ class Settings(BaseSettings):
     upload_dir: str = Field(default="var/uploads", alias="UPLOAD_DIR")
     max_upload_size_bytes: int = Field(default=5 * 1024 * 1024, alias="MAX_UPLOAD_SIZE_BYTES")
 
+    # --- Object storage (S3-compatible, e.g. Cloudflare R2) ----------------
+    # When a bucket + credentials are configured, document uploads go to S3/R2
+    # instead of the local disk (which is ephemeral on managed hosts). Leave
+    # blank for local development.
+    s3_bucket: str | None = Field(default=None, alias="S3_BUCKET")
+    s3_endpoint_url: str | None = Field(default=None, alias="S3_ENDPOINT_URL")
+    s3_access_key_id: str | None = Field(default=None, alias="S3_ACCESS_KEY_ID")
+    s3_secret_access_key: str | None = Field(default=None, alias="S3_SECRET_ACCESS_KEY")
+    s3_region: str = Field(default="auto", alias="S3_REGION")
+
+    @property
+    def s3_configured(self) -> bool:
+        return bool(self.s3_bucket and self.s3_access_key_id and self.s3_secret_access_key)
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _split_origins(cls, value: object) -> object:

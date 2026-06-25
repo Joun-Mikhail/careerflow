@@ -70,9 +70,7 @@ def test_job_filter_automation_and_sourced_application(db_session: Session) -> N
 
     db_session.add_all(
         [
-            AutomationRule(
-                user_id=user.id, filter_id=filt.id, run_frequency=RunFrequency.WEEKLY
-            ),
+            AutomationRule(user_id=user.id, filter_id=filt.id, run_frequency=RunFrequency.WEEKLY),
             SourcedApplication(
                 user_id=user.id,
                 job_id=job.id,
