@@ -1,0 +1,1 @@
+CareerFlow is a job-search tracker. Sign in with the demo account above to explore the dashboard, applications board, interviews, and analytics. No special hardware or location permissions are required. Push notifications are optional and only used for interview reminders when enabled in Settings.

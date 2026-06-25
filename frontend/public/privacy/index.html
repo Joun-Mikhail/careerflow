@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CareerFlow Privacy Policy</title>
+    <meta name="description" content="CareerFlow privacy policy — what data we collect and how we use it." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      :root { --brand: #4f46e5; --ink: #0f172a; --muted: #475569; --bg: #f7fafc; --surface: #fff; --border: #e2e8f0; }
+      * { box-sizing: border-box; }
+      body { margin: 0; font: 16px/1.6 system-ui, sans-serif; color: var(--ink); background: var(--bg); }
+      main { max-width: 720px; margin: 0 auto; padding: 32px 24px 64px; }
+      h1 { font-size: 1.75rem; margin: 0 0 8px; }
+      h2 { font-size: 1.15rem; margin: 28px 0 8px; }
+      p, li { color: var(--muted); }
+      a { color: var(--brand); }
+      table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 12px 0; }
+      th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+      th { background: var(--surface); color: var(--ink); }
+      .meta { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+      @media (prefers-color-scheme: dark) {
+        :root { --ink: #e2e8f0; --muted: #94a3b8; --bg: #0f172a; --surface: #1e293b; --border: #334155; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>CareerFlow Privacy Policy</h1>
+      <p class="meta">Last updated: 2026-06-24</p>
+
+      <p>
+        CareerFlow ("the Service") is an open-source job-search tracker. This policy
+        explains what personal data we collect, why we collect it, where it is stored,
+        and how to delete it.
+      </p>
+
+      <h2>Who we are</h2>
+      <p>
+        CareerFlow is maintained by Joun Mikhail and the open-source contributors on
+        <a href="https://github.com/Joun-Mikhail/careerflow">GitHub</a>.
+        For privacy questions or data-deletion requests, contact
+        <a href="mailto:gptmath55@gmail.com">gptmath55@gmail.com</a>.
+      </p>
+
+      <h2>Data we store</h2>
+      <p>When you create an account, the Service stores:</p>
+      <table>
+        <thead><tr><th>Data</th><th>Source</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>Email address</td><td>Signup</td><td>Account login</td></tr>
+          <tr><td>Password hash (bcrypt)</td><td>Your password</td><td>Authentication</td></tr>
+          <tr><td>Full name (optional)</td><td>Settings</td><td>Personalising the UI</td></tr>
+          <tr><td>Job-search records</td><td>You enter them</td><td>Applications, interviews, tasks, notes, offers</td></tr>
+          <tr><td>File attachments</td><td>You upload them</td><td>Resume and document storage</td></tr>
+          <tr><td>Session tokens</td><td>Server</td><td>Maintaining login</td></tr>
+          <tr><td>Audit log entries</td><td>Server</td><td>Security monitoring</td></tr>
+        </tbody>
+      </table>
+      <p>
+        We do <strong>not</strong> collect device identifiers, advertising IDs, contacts,
+        microphone or camera input, location data, or third-party analytics beyond Sentry
+        (optional, error reporting only when enabled by the operator).
+      </p>
+
+      <h2>Where data lives</h2>
+      <ul>
+        <li><strong>Database</strong> — PostgreSQL on the operator's infrastructure.</li>
+        <li><strong>Attachments</strong> — server disk under the configured upload directory.</li>
+        <li><strong>Tokens</strong> — device localStorage (web) or platform key/value store (mobile).</li>
+      </ul>
+      <p>We do not sell or share your data with advertisers or brokers.</p>
+
+      <h2>How long we keep data</h2>
+      <p>
+        Account data is retained while the account exists. Audit logs are kept for 90 days
+        in the reference deployment. Delete your account from Settings or email
+        <a href="mailto:gptmath55@gmail.com">gptmath55@gmail.com</a>.
+      </p>
+
+      <h2>Children</h2>
+      <p>CareerFlow is intended for users aged 16 and over.</p>
+
+      <h2>Security</h2>
+      <p>
+        Passwords are hashed with bcrypt. API traffic uses HTTPS. Auth endpoints are rate-limited.
+        Report vulnerabilities via our
+        <a href="https://github.com/Joun-Mikhail/careerflow/blob/main/SECURITY.md">Security Policy</a>.
+      </p>
+
+      <h2>Your rights (GDPR / UK GDPR)</h2>
+      <p>
+        You may access, correct, delete, or restrict processing of your data, and lodge a complaint
+        with your supervisory authority. Contact <a href="mailto:gptmath55@gmail.com">gptmath55@gmail.com</a>.
+      </p>
+
+      <p><a href="/">← Back to CareerFlow</a></p>
+    </main>
+  </body>
+</html>

@@ -4,16 +4,26 @@ from __future__ import annotations
 
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.errors import ensure_found
+from app.core.errors import ValidationError, ensure_found
+from app.core.logging import log_action
 from app.core.pagination import Page, PageParams
 from app.models.application import Application
+from app.models.company import Company
 from app.models.enums import ApplicationStatus
 from app.models.user import User
 from app.repositories.application import ApplicationRepository
 from app.repositories.company import CompanyRepository
-from app.schemas.application import ApplicationCreate, ApplicationRead, ApplicationUpdate
+from app.schemas.application import (
+    ApplicationCreate,
+    ApplicationImportFromUrl,
+    ApplicationImportPreview,
+    ApplicationRead,
+    ApplicationUpdate,
+)
+from app.services.url_import import ExtractedJob, Fetcher, extract_from_url
 
 
 class ApplicationService:
@@ -71,8 +81,97 @@ class ApplicationService:
         application = self.get(owner, application_id)
         self.repo.delete(application)
 
+    def import_from_url(
+        self,
+        owner: User,
+        data: ApplicationImportFromUrl,
+        *,
+        fetcher: Fetcher | None = None,
+    ) -> tuple[Application, ApplicationImportPreview]:
+        """Scrape ``data.url``, then create a company (optional) and application.
+
+        Returns ``(application, preview)`` so the caller can show the user what
+        was extracted and let them edit anything that the scraper got wrong.
+        """
+        if not data.url.lower().startswith(("http://", "https://")):
+            raise ValidationError("URL must start with http:// or https://.")
+
+        try:
+            extracted = extract_from_url(data.url, fetcher=fetcher)
+        except Exception as exc:
+            log_action(
+                "application_import_failed",
+                status="error",
+                user_id=owner.id,
+                reason=type(exc).__name__,
+            )
+            raise ValidationError(
+                "Could not fetch that URL — check the link and try again."
+            ) from exc
+
+        if not extracted.role_title:
+            raise ValidationError(
+                "We couldn't find a job title at that URL. Add the application manually."
+            )
+
+        company_id = (
+            self._resolve_company(owner, extracted.company_name)
+            if data.create_company and extracted.company_name
+            else None
+        )
+
+        application = Application(
+            user_id=owner.id,
+            company_id=company_id,
+            role_title=extracted.role_title,
+            status=data.status,
+            salary_min=extracted.salary_min,
+            salary_max=extracted.salary_max,
+            salary_currency=extracted.salary_currency,
+            location=extracted.location,
+            is_remote=extracted.is_remote,
+            application_url=extracted.application_url,
+            source=extracted.source,
+        )
+        self.repo.add(application)
+        log_action(
+            "application_imported",
+            status="ok",
+            user_id=owner.id,
+            source=extracted.source,
+        )
+        return application, _preview_of(extracted)
+
+    def _resolve_company(self, owner: User, name: str) -> UUID:
+        """Find an existing company by case-insensitive name, or create one."""
+        existing = self.companies.session.execute(
+            select(Company)
+            .where(Company.user_id == owner.id)
+            .where(Company.deleted_at.is_(None))
+            .where(Company.name.ilike(name))
+        ).scalar_one_or_none()
+        if existing is not None:
+            return existing.id
+        company = Company(user_id=owner.id, name=name)
+        self.companies.add(company)
+        return company.id
+
     def _ensure_company_owned(self, owner: User, company_id: UUID | None) -> None:
         """Validate that a referenced company exists and belongs to the user."""
         if company_id is None:
             return
         ensure_found(self.companies.get(owner.id, company_id), "Company not found.")
+
+
+def _preview_of(extracted: ExtractedJob) -> ApplicationImportPreview:
+    return ApplicationImportPreview(
+        role_title=extracted.role_title,
+        company_name=extracted.company_name,
+        location=extracted.location,
+        is_remote=extracted.is_remote,
+        salary_min=extracted.salary_min,
+        salary_max=extracted.salary_max,
+        salary_currency=extracted.salary_currency,
+        description=extracted.description,
+        source=extracted.source,
+    )

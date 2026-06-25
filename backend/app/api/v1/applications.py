@@ -10,7 +10,13 @@ from fastapi import APIRouter, Query, status
 from app.api.deps import CurrentUser, DbSession, Pagination
 from app.core.pagination import Page
 from app.models.enums import ApplicationStatus
-from app.schemas.application import ApplicationCreate, ApplicationRead, ApplicationUpdate
+from app.schemas.application import (
+    ApplicationCreate,
+    ApplicationImportFromUrl,
+    ApplicationImportResult,
+    ApplicationRead,
+    ApplicationUpdate,
+)
 from app.services.application import ApplicationService
 
 router = APIRouter(prefix="/applications", tags=["applications"])
@@ -51,6 +57,22 @@ def create_application(
 ) -> ApplicationRead:
     application = ApplicationService(db).create(current_user, data)
     return ApplicationRead.model_validate(application)
+
+
+@router.post(
+    "/import-from-url",
+    response_model=ApplicationImportResult,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create an application by scraping a job posting URL",
+)
+def import_application_from_url(
+    data: ApplicationImportFromUrl, current_user: CurrentUser, db: DbSession
+) -> ApplicationImportResult:
+    application, extracted = ApplicationService(db).import_from_url(current_user, data)
+    return ApplicationImportResult(
+        application=ApplicationRead.model_validate(application),
+        extracted=extracted,
+    )
 
 
 @router.get("/{application_id}", response_model=ApplicationRead, summary="Get an application")

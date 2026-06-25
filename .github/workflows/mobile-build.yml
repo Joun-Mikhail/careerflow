@@ -27,6 +27,15 @@ on:
   push:
     branches: [main, 'feature/**']
   workflow_dispatch:
+    inputs:
+      upload_testflight:
+        description: 'Upload signed build to TestFlight (requires Apple secrets)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -171,6 +180,12 @@ jobs:
           npm run build:web
           npx cap add ios || true
           npx cap sync ios
+          if [ -f public/native-assets/icon.png ]; then
+            npx @capacitor/assets generate \
+              --iconBackgroundColor "#4f46e5" \
+              --splashBackgroundColor "#4f46e5" \
+              --assetPath public/native-assets || true
+          fi
 
       - name: Install Fastlane
         working-directory: fastlane/ios
@@ -178,17 +193,22 @@ jobs:
           gem install bundler
           bundle install
 
-      - name: Build (signed if secrets, unsigned archive otherwise)
+      - name: Build and optionally upload to TestFlight
         env:
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          UPLOAD_TESTFLIGHT: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.upload_testflight == 'true' && 'true' || 'false' }}
         working-directory: fastlane/ios
         run: |
           if [ -n "$MATCH_PASSWORD" ] && [ -n "$MATCH_GIT_URL" ]; then
-            bundle exec fastlane build
+            if [ "$UPLOAD_TESTFLIGHT" = "true" ]; then
+              bundle exec fastlane beta
+            else
+              bundle exec fastlane build
+            fi
           else
             echo "::warning::No Apple signing secrets — producing an unsigned xcarchive."
             cd ../../frontend/ios/App
@@ -206,7 +226,7 @@ jobs:
         with:
           name: careerflow-ios
           path: |
-            fastlane/build/ios/*.ipa
+            build/ios/*.ipa
             build/CareerFlow.xcarchive
           if-no-files-found: warn
           retention-days: 14

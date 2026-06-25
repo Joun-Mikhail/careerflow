@@ -12,7 +12,36 @@ default_platform(:ios)
 # Generate the Apple ID app-specific password at
 #   https://appleid.apple.com/account/manage > App-Specific Passwords.
 
+IOS_DIR = File.expand_path("../../frontend/ios/App", __dir__)
+IOS_WORKSPACE = File.join(IOS_DIR, "App.xcworkspace")
+IOS_XCODEPROJ = File.join(IOS_DIR, "App.xcodeproj")
+BUILD_OUTPUT = File.expand_path("../../build/ios", __dir__)
+METADATA_PATH = File.expand_path("../metadata/ios", __dir__)
+
 platform :ios do
+  desc "Create the App Store Connect app record (requires Apple Developer enrollment)"
+  lane :setup_appstore do
+    UI.user_error!("Set FASTLANE_USER to your Apple ID email") unless ENV["FASTLANE_USER"]
+    UI.user_error!("Set APPLE_TEAM_ID to your 10-char team ID") unless ENV["APPLE_TEAM_ID"]
+
+    produce(
+      app_identifier: "com.careerflow.app",
+      app_name: "CareerFlow",
+      sku: "careerflow",
+      language: "English",
+      team_id: ENV["APPLE_TEAM_ID"],
+      username: ENV["FASTLANE_USER"]
+    )
+  end
+
+  desc "Initialize fastlane match (run once locally to create the signing cert repo)"
+  lane :setup_signing do
+    UI.user_error!("Set MATCH_GIT_URL to a private git repo for certs") unless ENV["MATCH_GIT_URL"]
+    UI.user_error!("Set MATCH_PASSWORD") unless ENV["MATCH_PASSWORD"]
+
+    match(type: "appstore", readonly: false, force_for_new_devices: true)
+  end
+
   desc "Sync code signing (uses fastlane match)"
   lane :certs do
     match(type: "appstore", readonly: is_ci)
@@ -20,17 +49,26 @@ platform :ios do
 
   desc "Build an iOS archive (unsigned if credentials are missing)"
   lane :build do
+    unless File.exist?(IOS_WORKSPACE)
+      UI.user_error!(
+        "iOS project not found at #{IOS_WORKSPACE}. " \
+        "Run scripts/build-mobile.sh ios or npx cap add ios from frontend/ first."
+      )
+    end
+
     if ENV["MATCH_PASSWORD"] && ENV["MATCH_GIT_URL"]
       certs
     else
       UI.important "MATCH_PASSWORD / MATCH_GIT_URL not set — producing an unsigned archive."
     end
 
+    FileUtils.mkdir_p(BUILD_OUTPUT)
+
     build_app(
-      workspace: "App.xcworkspace",
+      workspace: IOS_WORKSPACE,
       scheme: "App",
       export_method: "app-store",
-      output_directory: "fastlane/build/ios",
+      output_directory: BUILD_OUTPUT,
       output_name: "CareerFlow.ipa",
       include_symbols: false,
       skip_codesigning: ENV["MATCH_PASSWORD"].nil?,
@@ -52,7 +90,7 @@ platform :ios do
 
   desc "Submit a release build to App Store Connect"
   lane :release do
-    increment_build_number(xcodeproj: "App.xcodeproj")
+    increment_build_number(xcodeproj: IOS_XCODEPROJ)
     build
     deliver(
       submit_for_review: false,
@@ -60,7 +98,23 @@ platform :ios do
       force: true,
       skip_screenshots: false,
       skip_metadata: false,
-      metadata_path: "../metadata/ios"
+      metadata_path: METADATA_PATH
+    )
+  end
+
+  desc "Upload metadata and submit the latest build for Apple review"
+  lane :submit_review do
+    deliver(
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      skip_binary_upload: true,
+      skip_screenshots: false,
+      skip_metadata: false,
+      metadata_path: METADATA_PATH,
+      submission_information: {
+        add_id_info_uses_idfa: false
+      }
     )
   end
 end

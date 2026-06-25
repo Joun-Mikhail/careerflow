@@ -2,7 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { queryKeys } from '@/lib/queryClient';
 import { applicationsApi } from '@/services/applications';
-import type { ApplicationInput, ApplicationListParams } from '@/services/applications';
+import type {
+  ApplicationInput,
+  ApplicationListParams,
+  ImportFromUrlInput,
+} from '@/services/applications';
 
 function invalidateApplications(qc: ReturnType<typeof useQueryClient>) {
   qc.invalidateQueries({ queryKey: ['applications'] });
@@ -41,6 +45,17 @@ export function useUpdateApplication() {
     onSuccess: (_data, { id }) => {
       invalidateApplications(qc);
       qc.invalidateQueries({ queryKey: queryKeys.application(id) });
+    },
+  });
+}
+
+export function useImportApplicationFromUrl() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: ImportFromUrlInput) => applicationsApi.importFromUrl(input),
+    onSuccess: () => {
+      invalidateApplications(qc);
+      qc.invalidateQueries({ queryKey: ['companies'] });
     },
   });
 }
