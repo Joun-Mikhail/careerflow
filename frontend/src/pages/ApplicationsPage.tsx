@@ -1,4 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
+
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ApplicationForm } from '@/components/forms/ApplicationForm';
@@ -42,6 +44,22 @@ export function ApplicationsPage() {
   const [importing, setImporting] = useState(false);
   const [importUrl, setImportUrl] = useState('');
   const [importError, setImportError] = useState<string | null>(null);
+
+  // Keyboard shortcut: press 'n' to open the add-application modal
+  // (only when no input/textarea is focused)
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'n') return;
+      const el = document.activeElement;
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || (el as HTMLElement).isContentEditable)) {
+        return;
+      }
+      e.preventDefault();
+      setCreating(true);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   const { data, isLoading, isError, refetch } = useApplications({
     q: debouncedSearch || undefined,
