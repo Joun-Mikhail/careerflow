@@ -65,6 +65,37 @@ export interface TailorCvResult {
   saved_cv_id: string | null;
 }
 
+export interface JobSearchFilter {
+  id: string;
+  name: string;
+  title_keywords: string | null;
+  locations: string | null;
+  keywords: string | null;
+  remote: boolean;
+  salary_min: number | null;
+  salary_max: number | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Job {
+  id: string;
+  source: string;
+  external_id: string;
+  title: string;
+  company: string | null;
+  location: string | null;
+  description: string | null;
+  url: string;
+  salary_min: number | null;
+  salary_max: number | null;
+  remote: boolean;
+  posted_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface User {
   id: string;
   email: string;

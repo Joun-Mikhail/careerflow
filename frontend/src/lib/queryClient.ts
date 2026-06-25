@@ -38,4 +38,6 @@ export const queryKeys = {
   cvs: ['cvs'] as const,
   certificates: ['certificates'] as const,
   skills: ['skills'] as const,
+  jobFilters: ['job-filters'] as const,
+  jobs: ['jobs'] as const,
 };
