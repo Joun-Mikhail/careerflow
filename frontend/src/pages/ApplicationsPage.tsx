@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ApplicationForm } from '@/components/forms/ApplicationForm';
@@ -42,6 +42,35 @@ export function ApplicationsPage() {
   const [importing, setImporting] = useState(false);
   const [importUrl, setImportUrl] = useState('');
   const [importError, setImportError] = useState<string | null>(null);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const target = event.target;
+
+      if (
+        !(target instanceof HTMLElement) ||
+        target.matches('input, textarea, select') ||
+        target.isContentEditable ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.key.toLowerCase() !== 'n' ||
+        creating ||
+        importing
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      setCreating(true);
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [creating, importing]);
 
   const { data, isLoading, isError, refetch } = useApplications({
     q: debouncedSearch || undefined,
