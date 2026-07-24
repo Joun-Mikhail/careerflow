@@ -6,8 +6,16 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Removed stale feature branches from remote (already merged)
+- Closed unsolicited third-party pull requests
+
+### Planned
+
 - Drag-and-drop status changes on the pipeline board
-- CSV/JSON export of the pipeline
+- Assisted-apply tracking (Phase 6)
+- Automation rules and scheduler (Phase 7)
 
 ## [1.0.0] — 2026-06-20
 
