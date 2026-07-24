@@ -18,7 +18,7 @@ WORKDIR /app
 # (psycopg ships a binary wheel, so no system build deps are needed.)
 COPY pyproject.toml README.md ./
 COPY app ./app
-RUN pip install --upgrade "pip>=24.2" "setuptools>=78.1.1" \
+RUN pip install --upgrade "pip>=25.0" "setuptools>=83.0.0" \
     && pip install --no-cache-dir .
 
 # Copy migrations and the entrypoint.

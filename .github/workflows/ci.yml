@@ -33,7 +33,12 @@ jobs:
           cache-dependency-path: backend/pyproject.toml
 
       - name: Install dependencies
-        run: pip install -e ".[dev]"
+        # Upgrade pip/setuptools/wheel first so the venv has the latest patched
+        # build tools before we install anything. setuptools <83 has a known
+        # advisory (PYSEC-2026-3447) that pip-audit fails CI on.
+        run: |
+          python -m pip install --upgrade "pip>=25.0" "setuptools>=83.0.0" "wheel"
+          pip install -e ".[dev]"
 
       - name: Lint (ruff)
         run: ruff check .
