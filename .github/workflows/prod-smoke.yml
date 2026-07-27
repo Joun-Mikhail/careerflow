@@ -1,0 +1,60 @@
+name: Production smoke test
+
+# Verifies the deployed API is reachable, seeded, and correctly configured for
+# CORS from the production frontend. Run it manually after a deploy, or after
+# changing the backend host, to confirm the stack is wired end to end.
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_base:
+        description: Backend origin (no trailing slash)
+        required: true
+        default: https://careerflow-api-m4qf.onrender.com
+      frontend_origin:
+        description: Frontend origin used for the CORS preflight check
+        required: true
+        default: https://frontend-jade-two-zfchqjb5ws.vercel.app
+
+env:
+  API_BASE: ${{ github.event.inputs.api_base || 'https://careerflow-api-m4qf.onrender.com' }}
+  FRONTEND_ORIGIN: ${{ github.event.inputs.frontend_origin || 'https://frontend-jade-two-zfchqjb5ws.vercel.app' }}
+
+jobs:
+  smoke:
+    name: Probe deployed API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Health probe (allows for a free-tier cold start)
+        run: |
+          echo "Probing $API_BASE/health"
+          # Render free instances sleep; the first request can take ~60s to wake.
+          code=$(curl -sS -o /tmp/health.txt -w '%{http_code}' --max-time 180 "$API_BASE/health" || echo 000)
+          echo "HTTP $code"
+          cat /tmp/health.txt || true
+          echo
+          test "$code" = "200"
+
+      - name: CORS preflight from the frontend origin
+        run: |
+          echo "Preflighting $API_BASE/api/v1/auth/login as $FRONTEND_ORIGIN"
+          curl -sS -i -X OPTIONS "$API_BASE/api/v1/auth/login" \
+            -H "Origin: $FRONTEND_ORIGIN" \
+            -H 'Access-Control-Request-Method: POST' \
+            -H 'Access-Control-Request-Headers: content-type' \
+            --max-time 60 | tee /tmp/preflight.txt
+          echo
+          grep -i '^access-control-allow-origin' /tmp/preflight.txt
+
+      - name: Demo login round-trip
+        run: |
+          # Credentials are the seeded public demo account documented in the README.
+          code=$(curl -sS -o /tmp/login.json -w '%{http_code}' --max-time 60 \
+            -X POST "$API_BASE/api/v1/auth/login" \
+            -H 'Content-Type: application/json' \
+            -H "Origin: $FRONTEND_ORIGIN" \
+            -d '{"email":"demo@careerflow.app","password":"DemoPass123!"}' || echo 000)
+          echo "HTTP $code"
+          head -c 400 /tmp/login.json || true
+          echo
+          test "$code" = "200"
