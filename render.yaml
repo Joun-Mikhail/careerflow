@@ -33,8 +33,11 @@ services:
         value: production
       - key: SEED_DEMO_DATA
         value: "true"
+      # Browser origins allowed to call the API. This replaces the application
+      # defaults wholesale, so the Capacitor WebView origins used by the mobile
+      # builds have to be listed alongside the deployed web frontend.
       - key: CORS_ORIGINS
-        sync: false  # set after the frontend URL is known
+        value: https://frontend-jade-two-zfchqjb5ws.vercel.app,https://localhost,capacitor://localhost,ionic://localhost
       - key: PORT
         value: "8000"
 

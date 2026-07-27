@@ -15,9 +15,6 @@ on:
         description: Frontend origin used for the CORS preflight check
         required: true
         default: https://frontend-jade-two-zfchqjb5ws.vercel.app
-  push:
-    branches:
-      - 'claude/**'
 
 env:
   API_BASE: ${{ github.event.inputs.api_base || 'https://careerflow-api-m4qf.onrender.com' }}
