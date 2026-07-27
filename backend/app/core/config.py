@@ -68,6 +68,7 @@ class Settings(BaseSettings):
             "http://localhost",
             "capacitor://localhost",
             "ionic://localhost",
+            "https://frontend-jade-two-zfchqjb5ws.vercel.app",
         ],
         alias="CORS_ORIGINS",
     )
