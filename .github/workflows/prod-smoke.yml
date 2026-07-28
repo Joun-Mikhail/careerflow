@@ -1,8 +1,9 @@
 name: Production smoke test
 
 # Verifies the deployed API is reachable, seeded, and correctly configured for
-# CORS from the production frontend. Run it manually after a deploy, or after
-# changing the backend host, to confirm the stack is wired end to end.
+# CORS from the production frontend, and that the frontend bundle actually
+# points at that API. Run it manually after a deploy, or after changing the
+# backend host, to confirm the stack is wired end to end.
 
 on:
   workflow_dispatch:
@@ -58,3 +59,39 @@ jobs:
           head -c 400 /tmp/login.json || true
           echo
           test "$code" = "200"
+
+  frontend:
+    name: Inspect deployed frontend bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: The served bundle must call the deployed API
+        run: |
+          api_host=$(echo "$API_BASE" | sed -E 's#^https?://##')
+          echo "Expecting the bundle to reference: $api_host"
+
+          curl -sS --max-time 60 "$FRONTEND_ORIGIN" -o /tmp/index.html
+          # Vite emits hashed asset names, so discover them rather than guess.
+          mapfile -t bundles < <(grep -oE '/assets/[A-Za-z0-9._-]+\.js' /tmp/index.html | sort -u)
+          echo "Found ${#bundles[@]} script asset(s): ${bundles[*]}"
+          if [ "${#bundles[@]}" -eq 0 ]; then
+            # Usually means the response was not the app at all — e.g. a
+            # protected preview deployment serving Vercel's login page.
+            echo "No script assets in the response. First 300 bytes served:"
+            head -c 300 /tmp/index.html
+            exit 1
+          fi
+
+          : > /tmp/all.js
+          for b in "${bundles[@]}"; do
+            curl -sS --max-time 60 "$FRONTEND_ORIGIN$b" >> /tmp/all.js
+          done
+          wc -c < /tmp/all.js
+
+          if grep -qF "$api_host" /tmp/all.js; then
+            echo "PASS: bundle points at $api_host"
+          else
+            echo "FAIL: bundle does NOT reference $api_host."
+            echo "Absolute https URLs found in the bundle:"
+            grep -oE 'https://[A-Za-z0-9._-]+' /tmp/all.js | sort -u | head -30
+            exit 1
+          fi
