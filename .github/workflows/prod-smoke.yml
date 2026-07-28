@@ -73,7 +73,13 @@ jobs:
           # Vite emits hashed asset names, so discover them rather than guess.
           mapfile -t bundles < <(grep -oE '/assets/[A-Za-z0-9._-]+\.js' /tmp/index.html | sort -u)
           echo "Found ${#bundles[@]} script asset(s): ${bundles[*]}"
-          test "${#bundles[@]}" -gt 0
+          if [ "${#bundles[@]}" -eq 0 ]; then
+            # Usually means the response was not the app at all — e.g. a
+            # protected preview deployment serving Vercel's login page.
+            echo "No script assets in the response. First 300 bytes served:"
+            head -c 300 /tmp/index.html
+            exit 1
+          fi
 
           : > /tmp/all.js
           for b in "${bundles[@]}"; do
