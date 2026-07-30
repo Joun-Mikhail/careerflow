@@ -1,0 +1,60 @@
+name: Keep API warm
+
+# The API is hosted on a plan that suspends an instance after ~15 minutes of
+# inactivity, and waking it costs the next visitor most of a minute. Pinging
+# the health endpoint on a shorter cycle than that keeps a real visitor from
+# ever being the one who pays for the wake-up.
+#
+# Two things this deliberately does not pretend to be:
+#   - A guarantee. Scheduled workflows are best-effort and are delayed when
+#     GitHub is busy, so an occasional cold start still gets through.
+#   - Uptime monitoring. It fails loudly when the API is unreachable, which is
+#     a useful signal, but it is not a substitute for real alerting.
+#
+# GitHub disables scheduled workflows on public repositories after 60 days
+# without repository activity; re-enable it from the Actions tab if that hits.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+    inputs:
+      api_base:
+        description: Backend origin (no trailing slash)
+        required: true
+        default: https://careerflow-api-m4qf.onrender.com
+
+permissions: {}
+
+# A ping that outlives its slot should not stack up behind the next one.
+concurrency:
+  group: keep-warm
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    name: Ping health endpoint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: GET /health
+        env:
+          API_BASE: ${{ github.event.inputs.api_base || 'https://careerflow-api-m4qf.onrender.com' }}
+        run: |
+          # Three attempts: a cold instance can exceed the first timeout while
+          # it is still genuinely coming up, and that is not an outage.
+          for attempt in 1 2 3; do
+            code=$(curl -sS -o /tmp/health.txt -w '%{http_code}' --max-time 120 \
+              "$API_BASE/health" || echo 000)
+            echo "attempt $attempt: HTTP $code"
+            if [ "$code" = "200" ]; then
+              cat /tmp/health.txt
+              echo
+              exit 0
+            fi
+            sleep 15
+          done
+
+          echo "Health endpoint did not return 200 after 3 attempts."
+          cat /tmp/health.txt || true
+          exit 1
