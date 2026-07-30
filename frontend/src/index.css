@@ -1052,3 +1052,99 @@ h4 {
     transform: translateX(12px);
   }
 }
+
+/* ----------------------------------------------------------------------------
+ * Long waits (session restore, cold-start sign-in)
+ * ------------------------------------------------------------------------- */
+.waiting {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+}
+.waiting-orb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.waiting-orb span {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--brand-500);
+  animation: waiting-bounce 1.2s ease-in-out infinite;
+}
+.waiting-orb span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.waiting-orb span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes waiting-bounce {
+  0%,
+  70%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  35% {
+    transform: translateY(-9px);
+    opacity: 1;
+  }
+}
+.waiting-status {
+  margin: 0;
+  max-width: 34rem;
+  color: var(--text-muted);
+}
+.waiting-tip {
+  max-width: 34rem;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-xs);
+  animation: waiting-tip-in 0.45s ease both;
+}
+.waiting-tip-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--brand-600);
+}
+.waiting-tip p {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.55;
+}
+@keyframes waiting-tip-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.waiting-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+  animation: waiting-tip-in 0.45s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waiting-orb span,
+  .waiting-tip,
+  .waiting-hint {
+    animation: none;
+  }
+  .waiting-orb span {
+    opacity: 0.75;
+  }
+}

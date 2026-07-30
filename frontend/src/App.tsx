@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import { LoadingState } from './components/feedback/States';
+import { WaitingRoom } from './components/feedback/WaitingRoom';
 import { useAuth } from './contexts/AuthContext';
 import { AppLayout } from './layouts/AppLayout';
 import { AuthLayout } from './layouts/AuthLayout';
@@ -21,14 +21,14 @@ import { RegisterPage } from './pages/auth/RegisterPage';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { status } = useAuth();
-  if (status === 'loading') return <LoadingState label="Restoring your session…" />;
+  if (status === 'loading') return <WaitingRoom label="Restoring your session…" />;
   if (status === 'unauthenticated') return <Navigate to="/login" replace />;
   return children;
 }
 
 function PublicOnly({ children }: { children: JSX.Element }) {
   const { status } = useAuth();
-  if (status === 'loading') return <LoadingState />;
+  if (status === 'loading') return <WaitingRoom />;
   if (status === 'authenticated') return <Navigate to="/" replace />;
   return children;
 }
