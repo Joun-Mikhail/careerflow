@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { WaitingHint } from '@/components/feedback/WaitingRoom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
 import { ApiError } from '@/services/api';
@@ -94,6 +95,8 @@ export function LoginPage() {
       <button className="btn btn-secondary btn-block" type="submit" disabled={submitting}>
         {submitting ? 'Signing in…' : 'Sign in'}
       </button>
+
+      <WaitingHint active={submitting} label="Signing you in…" />
 
       <div className="divider" />
       <p className="muted" style={{ textAlign: 'center' }}>

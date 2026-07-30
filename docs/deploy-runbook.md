@@ -133,6 +133,26 @@ at the production `BASE_URL`).
 
 ---
 
+## Cold starts on free plans
+
+Free instances on Render (and most comparable plans) suspend after ~15 minutes
+of inactivity. The next request wakes the instance and waits for it — usually
+30–60 seconds. Two things in the repository address this:
+
+- **`.github/workflows/keep-warm.yml`** pings `/health` every 10 minutes so a
+  visitor is rarely the request that triggers the wake-up. Scheduled workflows
+  are best-effort and get delayed under load, so this reduces cold starts
+  rather than eliminating them. GitHub also disables scheduled workflows on
+  public repositories after 60 days without repository activity — re-enable it
+  from the **Actions** tab if pings stop.
+- **The waiting UI** (`frontend/src/components/feedback/WaitingRoom.tsx`)
+  explains the delay and shows rotating tips once a wait passes 7 seconds, so
+  the remaining cold starts read as a slow server rather than a broken app.
+
+Point the ping at a different backend with **Actions → Keep API warm → Run
+workflow**, or edit the default in the workflow. Upgrading to an always-on
+paid instance removes the problem outright and makes both of these redundant.
+
 ## Single-platform alternative (Railway full-stack)
 
 If you prefer one platform: deploy **two Railway services** from this repo — one

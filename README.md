@@ -372,6 +372,10 @@ See [docs/05-security-design.md](docs/05-security-design.md) and the audit in
   logger.
 - **Health probe** — `GET /health` reports database connectivity, app version,
   and uptime, and returns `503` when the database is unreachable.
+- **Cold-start mitigation** — a scheduled workflow pings `/health` every 10
+  minutes so free-tier instances rarely suspend, and any wait that does happen
+  is explained in the UI rather than shown as a bare spinner. See
+  [docs/deploy-runbook.md](docs/deploy-runbook.md#cold-starts-on-free-plans).
 - **Error monitoring (Sentry)** — optional, env-gated on both the API
   (`SENTRY_DSN`) and the SPA (`VITE_SENTRY_DSN`); a no-op when unset.
 
