@@ -37,7 +37,7 @@ services:
       # defaults wholesale, so the Capacitor WebView origins used by the mobile
       # builds have to be listed alongside the deployed web frontend.
       - key: CORS_ORIGINS
-        value: https://frontend-jade-two-zfchqjb5ws.vercel.app,https://localhost,capacitor://localhost,ionic://localhost
+        value: https://careerflow2.vercel.app,https://frontend-jade-two-zfchqjb5ws.vercel.app,https://localhost,capacitor://localhost,ionic://localhost
       - key: PORT
         value: "8000"
 

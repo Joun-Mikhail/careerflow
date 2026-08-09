@@ -15,11 +15,11 @@ on:
       frontend_origin:
         description: Frontend origin used for the CORS preflight check
         required: true
-        default: https://frontend-jade-two-zfchqjb5ws.vercel.app
+        default: https://careerflow2.vercel.app
 
 env:
   API_BASE: ${{ github.event.inputs.api_base || 'https://careerflow-api-m4qf.onrender.com' }}
-  FRONTEND_ORIGIN: ${{ github.event.inputs.frontend_origin || 'https://frontend-jade-two-zfchqjb5ws.vercel.app' }}
+  FRONTEND_ORIGIN: ${{ github.event.inputs.frontend_origin || 'https://careerflow2.vercel.app' }}
 
 jobs:
   smoke:
