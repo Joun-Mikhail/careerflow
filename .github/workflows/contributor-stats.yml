@@ -14,9 +14,6 @@ name: Rebuild contributor stats
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/contributor-stats.yml'
 
 permissions:
   contents: read
