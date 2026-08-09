@@ -1,0 +1,71 @@
+name: Rebuild contributor stats
+
+# The Contributors sidebar is served from a cached statistics snapshot, not
+# from a live read of the commit log. After commit authorship changes, the
+# snapshot can keep listing an author that no longer appears in any commit.
+#
+# GitHub's statistics API rebuilds that snapshot on demand: the first request
+# returns 202 and schedules a background job, and a later request returns 200
+# with the regenerated data. This workflow pokes it and prints what GitHub
+# actually reports, so the sidebar can be checked against the source of truth
+# instead of guessed at.
+#
+# Safe to delete once the sidebar is correct — it only reads public data.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild:
+    name: Trigger rebuild and report contributors
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Poke the statistics API until it stops returning 202
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            code=$(curl -sS -o /tmp/stats.json -w '%{http_code}' \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H 'Accept: application/vnd.github+json' \
+              "https://api.github.com/repos/$REPO/stats/contributors")
+            echo "attempt $attempt: HTTP $code"
+            # 202 means the snapshot is being regenerated right now.
+            if [ "$code" != "202" ]; then
+              break
+            fi
+            sleep 20
+          done
+
+          echo "--- authors in the regenerated statistics snapshot ---"
+          jq -r '.[]?.author.login // "unknown"' /tmp/stats.json | sort -u
+
+      - name: Report the contributors list backing the sidebar
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          curl -sS -o /tmp/contributors.json \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            "https://api.github.com/repos/$REPO/contributors?per_page=100&anon=1"
+
+          echo "--- login / name / contributions ---"
+          jq -r '.[] | "\(.login // .name // "anonymous")\t\(.type)\t\(.contributions)"' \
+            /tmp/contributors.json
+
+          if jq -e 'map(((.login // "") + (.name // "")) | ascii_downcase | test("claude|anthropic")) | any' \
+              /tmp/contributors.json >/dev/null; then
+            echo
+            echo "STILL LISTED: GitHub continues to report a Claude contributor."
+            echo "No commit in any ref is authored by it, so this is the cached"
+            echo "snapshot and only GitHub Support can force-clear it."
+          else
+            echo
+            echo "CLEAR: GitHub no longer reports a Claude contributor."
+          fi
