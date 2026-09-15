@@ -86,6 +86,11 @@ filterwarnings = [
     "error::DeprecationWarning",
     # Starlette's TestClient emits this via its httpx integration; out of our control.
     "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+    # Starlette's TestClient reads a deprecated anyio alias at import time, so
+    # erroring on it fails collection before a single test runs. The current
+    # release still references it, leaving nothing to upgrade to; narrow the
+    # ignore to this one message so our own deprecations keep failing loudly.
+    "ignore:The anyio.abc.BlockingPortal alias is deprecated",
 ]
 
 [tool.coverage.run]
