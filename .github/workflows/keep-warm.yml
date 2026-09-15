@@ -9,7 +9,10 @@ name: Keep API warm
 #   - A guarantee. Scheduled workflows are best-effort and are delayed when
 #     GitHub is busy, so an occasional cold start still gets through.
 #   - Uptime monitoring. It fails loudly when the API is unreachable, which is
-#     a useful signal, but it is not a substitute for real alerting.
+#     a useful signal, but it is not a substitute for real alerting. The job
+#     timeout below must stay comfortably above the retry budget: a run that
+#     overruns it is *cancelled*, and a cancelled run looks like a skipped
+#     ping rather than the outage it actually is.
 #
 # GitHub disables scheduled workflows on public repositories after 60 days
 # without repository activity; re-enable it from the Actions tab if that hits.
@@ -35,7 +38,8 @@ jobs:
   ping:
     name: Ping health endpoint
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    # 3 attempts x 120s plus the sleeps between them is ~6.5 minutes.
+    timeout-minutes: 10
     steps:
       - name: GET /health
         env:
