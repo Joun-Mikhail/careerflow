@@ -40,4 +40,6 @@ export const queryKeys = {
   skills: ['skills'] as const,
   jobFilters: ['job-filters'] as const,
   jobs: ['jobs'] as const,
+  interviewQuestions: (params?: unknown) => ['interview-questions', params] as const,
+  contacts: (params?: unknown) => ['contacts', params] as const,
 };

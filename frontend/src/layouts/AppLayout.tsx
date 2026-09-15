@@ -16,6 +16,7 @@ import {
   SearchIcon,
   SettingsIcon,
   SunIcon,
+  UsersIcon,
 } from '@/components/icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -25,7 +26,9 @@ const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: DashboardIcon, end: true },
   { to: '/applications', label: 'Applications', icon: BriefcaseIcon, end: false },
   { to: '/interviews', label: 'Interviews', icon: CalendarIcon, end: false },
+  { to: '/interview-prep', label: 'Interview prep', icon: CheckSquareIcon, end: false },
   { to: '/companies', label: 'Companies', icon: BuildingIcon, end: false },
+  { to: '/contacts', label: 'Contacts', icon: UsersIcon, end: false },
   { to: '/documents', label: 'Documents', icon: FileTextIcon, end: false },
   { to: '/job-search', label: 'Job search', icon: SearchIcon, end: false },
   { to: '/tasks', label: 'Tasks', icon: CheckSquareIcon, end: false },

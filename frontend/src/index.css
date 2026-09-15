@@ -1201,3 +1201,41 @@ h4 {
   background: color-mix(in srgb, var(--success) 14%, transparent);
   color: var(--success);
 }
+
+/* ----------------------------------------------------------------------------
+ * Interview prep question bank
+ * ------------------------------------------------------------------------- */
+.prep-item {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+}
+.prep-question {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.prep-answer {
+  margin: var(--space-3) 0 0;
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--border-strong);
+  color: var(--text-muted);
+  line-height: 1.6;
+  /* Answers are typed as plain text; keep the author's line breaks. */
+  white-space: pre-wrap;
+}
+.chip--button {
+  border: 1px solid transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 550;
+}
+.chip--button:hover {
+  border-color: var(--border-strong);
+}
+.chip--active {
+  background: var(--brand-600);
+  color: var(--text-on-brand);
+}

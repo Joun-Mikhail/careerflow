@@ -16,8 +16,10 @@ from app.api.v1 import (
     auth,
     certificates,
     companies,
+    contacts,
     cvs,
     dashboard,
+    interview_questions,
     interviews,
     job_filters,
     jobs,
@@ -31,8 +33,10 @@ from app.api.v1 import (
 api_router = APIRouter()
 api_router.include_router(auth.router)
 api_router.include_router(companies.router)
+api_router.include_router(contacts.router)
 api_router.include_router(applications.router)
 api_router.include_router(interviews.router)
+api_router.include_router(interview_questions.router)
 api_router.include_router(notes.router)
 api_router.include_router(tasks.router)
 api_router.include_router(attachments.router)

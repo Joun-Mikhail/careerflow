@@ -285,3 +285,30 @@ export interface JobMatch {
   job_seniority: string | null;
   cv_seniority: string | null;
 }
+
+/** A question in the interview prep bank. */
+export interface InterviewQuestion {
+  id: string;
+  question: string;
+  answer: string | null;
+  /** Comma-separated, normalised lower-case labels. */
+  tags: string | null;
+  application_id: string | null;
+  asked: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/** A recruiter, hiring manager or referrer. */
+export interface Contact {
+  id: string;
+  name: string;
+  role: string | null;
+  email: string | null;
+  phone: string | null;
+  linkedin_url: string | null;
+  notes: string | null;
+  company_id: string | null;
+  created_at: string;
+  updated_at: string;
+}

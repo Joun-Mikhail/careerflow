@@ -103,6 +103,8 @@ It then launches in its own window, works offline for the shell, and shows up al
 - 📁 **Document vault** — store multiple CVs (PDF/DOCX), certificates, and skills; durable object storage (Cloudflare R2 / S3) with a local-disk fallback.
 - ✨ **AI CV tailoring** — rewrite a CV (and optional cover letter) for a specific job via OpenAI (gpt-4o-mini), saved as a new versioned CV. Falls back to an offline stub with no API key.
 - 🔎 **Job search** — save search filters and fetch matching jobs from Adzuna (with a mock provider when no keys are set); tailor a CV straight from a fetched job.
+- 🧠 **Interview prep** — a tagged question bank with your prepared answers, filterable by topic and markable as "actually asked", so the second interview builds on the first.
+- 👥 **Contacts** — recruiters, hiring managers and referrers, searchable and linked to companies; deleting a company keeps its people.
 - 🎯 **Match scoring** — score any fetched job against one of your CVs and see *why*: a skills/keywords/seniority breakdown plus the skills the posting asks for that your CV never mentions. Fully deterministic, so it needs no API key and costs nothing.
 - ⚙️ **Settings** — update your profile and change your password.
 - 📱 **Installable PWA + mobile UI** — install to a phone/desktop home screen; on small screens the sidebar becomes a slide-in drawer.
