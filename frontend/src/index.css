@@ -1148,3 +1148,56 @@ h4 {
     opacity: 0.75;
   }
 }
+
+/* ----------------------------------------------------------------------------
+ * CV-to-job match score
+ * ------------------------------------------------------------------------- */
+.match-badge {
+  /* The badge sits inside a button, so it must not swallow the click. */
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  text-transform: none;
+}
+.match-badge--strong {
+  background: color-mix(in srgb, var(--success) 16%, transparent);
+  color: var(--success);
+}
+.match-badge--promising {
+  background: color-mix(in srgb, var(--warning) 18%, transparent);
+  color: var(--warning);
+}
+.match-badge--stretch {
+  background: var(--bg-sunken);
+  color: var(--text-muted);
+}
+
+.match-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+}
+.match-detail-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.85rem;
+}
+.match-detail-label {
+  min-width: 7.5rem;
+  color: var(--text-subtle);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.chip--gap {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.chip--ok {
+  background: color-mix(in srgb, var(--success) 14%, transparent);
+  color: var(--success);
+}

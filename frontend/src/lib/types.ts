@@ -263,3 +263,25 @@ export interface ApiErrorBody {
     details?: unknown;
   };
 }
+
+/** Component scores behind a CV-to-job match, each 0-100. */
+export interface MatchBreakdown {
+  skills: number;
+  keywords: number;
+  seniority: number;
+}
+
+export type MatchVerdict = 'strong' | 'promising' | 'stretch';
+
+/** One CV-to-job comparison. `job_id` is null for an inline job description. */
+export interface JobMatch {
+  job_id: string | null;
+  score: number;
+  verdict: MatchVerdict;
+  matched_skills: string[];
+  missing_skills: string[];
+  missing_keywords: string[];
+  breakdown: MatchBreakdown;
+  job_seniority: string | null;
+  cv_seniority: string | null;
+}

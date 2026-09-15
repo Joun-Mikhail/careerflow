@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import type { FormEvent } from 'react';
 
 import { EmptyState, ErrorState } from '@/components/feedback/States';
 import { TableSkeleton } from '@/components/feedback/Skeletons';
 import { ExternalLinkIcon, PlusIcon, SearchIcon, TrashIcon } from '@/components/icons';
+import { MatchBadge, MatchDetail } from '@/components/jobs/MatchScore';
 import { useToast } from '@/contexts/ToastContext';
+import { useCvs } from '@/hooks/useDocuments';
 import {
   useCreateJobFilter,
   useDeleteJobFilter,
@@ -12,7 +14,10 @@ import {
   useJobs,
   useRunSearch,
 } from '@/hooks/useJobs';
+import { useScoreMatches } from '@/hooks/useMatching';
 import { ApiError } from '@/services/api';
+
+import type { JobMatch } from '@/lib/types';
 
 function errorMessage(err: unknown, fallback: string): string {
   return err instanceof ApiError ? err.message : fallback;
@@ -29,15 +34,20 @@ export function JobSearchPage() {
   const toast = useToast();
   const { data: filters, isLoading: filtersLoading } = useJobFilters();
   const { data: jobs, isLoading: jobsLoading, isError, refetch } = useJobs();
+  const { data: cvs } = useCvs();
   const createFilter = useCreateJobFilter();
   const deleteFilter = useDeleteJobFilter();
   const runSearch = useRunSearch();
+  const scoreMatches = useScoreMatches();
 
   const [name, setName] = useState('');
   const [titleKeywords, setTitleKeywords] = useState('');
   const [locations, setLocations] = useState('');
   const [remote, setRemote] = useState(false);
   const [salaryMin, setSalaryMin] = useState('');
+  const [cvId, setCvId] = useState('');
+  const [matches, setMatches] = useState<Record<string, JobMatch>>({});
+  const [openMatchId, setOpenMatchId] = useState<string | null>(null);
 
   async function handleCreate(event: FormEvent) {
     event.preventDefault();
@@ -66,13 +76,45 @@ export function JobSearchPage() {
 
   function handleRun(id: string) {
     runSearch.mutate(id, {
-      onSuccess: (results) => toast.success(`Found ${results.length} job${results.length === 1 ? '' : 's'}.`),
+      onSuccess: (results) => {
+        // Scores belong to the previous result set, so drop them.
+        setMatches({});
+        setOpenMatchId(null);
+        toast.success(`Found ${results.length} job${results.length === 1 ? '' : 's'}.`);
+      },
       onError: (e) => toast.error(errorMessage(e, 'Search failed.')),
     });
   }
 
+  function handleScore() {
+    if (!cvId) {
+      toast.error('Pick a CV to score against.');
+      return;
+    }
+    scoreMatches.mutate(
+      { cv_id: cvId, job_ids: foundJobs.map((job) => job.id) },
+      {
+        onSuccess: (results) => {
+          const byJob: Record<string, JobMatch> = {};
+          for (const result of results) {
+            if (result.job_id) byJob[result.job_id] = result;
+          }
+          setMatches(byJob);
+          const scored = Object.keys(byJob).length;
+          if (scored === 0) {
+            toast.error('None of these jobs have a description to score.');
+            return;
+          }
+          toast.success(`Scored ${scored} job${scored === 1 ? '' : 's'}.`);
+        },
+        onError: (e) => toast.error(errorMessage(e, 'Could not score these jobs.')),
+      },
+    );
+  }
+
   const savedFilters = filters ?? [];
   const foundJobs = jobs ?? [];
+  const hasScores = Object.keys(matches).length > 0;
 
   return (
     <>
@@ -156,7 +198,33 @@ export function JobSearchPage() {
       </div>
 
       <div className="card">
-        <div className="card-header"><span className="card-title">Matching jobs</span></div>
+        <div className="card-header row-between" style={{ gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+          <span className="card-title">Matching jobs</span>
+          {foundJobs.length > 0 && (
+            <div className="row" style={{ gap: 'var(--space-2)', alignItems: 'center' }}>
+              <label className="subtle" htmlFor="match-cv">Score against</label>
+              <select
+                id="match-cv"
+                className="input"
+                style={{ width: 'auto', minWidth: 160 }}
+                value={cvId}
+                onChange={(e) => setCvId(e.target.value)}
+              >
+                <option value="">Select a CV…</option>
+                {(cvs ?? []).map((cv) => (
+                  <option key={cv.id} value={cv.id}>{cv.title}</option>
+                ))}
+              </select>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={handleScore}
+                disabled={scoreMatches.isPending || !cvId}
+              >
+                {scoreMatches.isPending ? 'Scoring…' : 'Score matches'}
+              </button>
+            </div>
+          )}
+        </div>
         {jobsLoading ? (
           <TableSkeleton columns={4} />
         ) : isError ? (
@@ -168,23 +236,56 @@ export function JobSearchPage() {
           <div className="table-wrap">
             <table className="table">
               <thead>
-                <tr><th>Role</th><th>Company</th><th>Location</th><th>Salary</th><th></th></tr>
+                <tr>
+                  <th>Role</th><th>Company</th><th>Location</th><th>Salary</th>
+                  {hasScores && <th>Match</th>}
+                  <th></th>
+                </tr>
               </thead>
               <tbody>
-                {foundJobs.map((job) => (
-                  <tr key={job.id}>
-                    <td style={{ fontWeight: 600 }}>{job.title}</td>
-                    <td className="muted">{job.company ?? '—'}</td>
-                    <td className="muted">{job.remote ? 'Remote' : (job.location ?? '—')}</td>
-                    <td className="muted">{salaryLabel(job.salary_min, job.salary_max)}</td>
-                    <td>
-                      <a className="btn btn-ghost btn-sm" href={job.url} target="_blank"
-                        rel="noopener noreferrer" title="Open posting" style={{ justifyContent: 'flex-end' }}>
-                        <ExternalLinkIcon width={16} height={16} />
-                      </a>
-                    </td>
-                  </tr>
-                ))}
+                {foundJobs.map((job) => {
+                  const match = matches[job.id];
+                  const isOpen = openMatchId === job.id;
+                  return (
+                    <Fragment key={job.id}>
+                      <tr>
+                        <td style={{ fontWeight: 600 }}>{job.title}</td>
+                        <td className="muted">{job.company ?? '—'}</td>
+                        <td className="muted">{job.remote ? 'Remote' : (job.location ?? '—')}</td>
+                        <td className="muted">{salaryLabel(job.salary_min, job.salary_max)}</td>
+                        {hasScores && (
+                          <td>
+                            {match ? (
+                              <button
+                                className="btn btn-ghost btn-sm"
+                                onClick={() => setOpenMatchId(isOpen ? null : job.id)}
+                                aria-expanded={isOpen}
+                                title={isOpen ? 'Hide breakdown' : 'Why this score?'}
+                              >
+                                <MatchBadge match={match} />
+                              </button>
+                            ) : (
+                              <span className="subtle">—</span>
+                            )}
+                          </td>
+                        )}
+                        <td>
+                          <a className="btn btn-ghost btn-sm" href={job.url} target="_blank"
+                            rel="noopener noreferrer" title="Open posting" style={{ justifyContent: 'flex-end' }}>
+                            <ExternalLinkIcon width={16} height={16} />
+                          </a>
+                        </td>
+                      </tr>
+                      {isOpen && match && (
+                        <tr>
+                          <td colSpan={6}>
+                            <MatchDetail match={match} />
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>

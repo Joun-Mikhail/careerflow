@@ -21,6 +21,7 @@ from app.api.v1 import (
     interviews,
     job_filters,
     jobs,
+    matching,
     notes,
     offers,
     skills,
@@ -45,3 +46,4 @@ api_router.include_router(skills.router)
 api_router.include_router(ai.router)
 api_router.include_router(job_filters.router)
 api_router.include_router(jobs.router)
+api_router.include_router(matching.router)
