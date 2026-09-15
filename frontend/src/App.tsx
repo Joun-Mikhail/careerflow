@@ -8,8 +8,10 @@ import { AnalyticsPage } from './pages/AnalyticsPage';
 import { ApplicationDetailPage } from './pages/ApplicationDetailPage';
 import { ApplicationsPage } from './pages/ApplicationsPage';
 import { CompaniesPage } from './pages/CompaniesPage';
+import { ContactsPage } from './pages/ContactsPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { DocumentsPage } from './pages/DocumentsPage';
+import { InterviewPrepPage } from './pages/InterviewPrepPage';
 import { InterviewsPage } from './pages/InterviewsPage';
 import { JobSearchPage } from './pages/JobSearchPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -58,7 +60,9 @@ export default function App() {
         <Route path="/applications" element={<ApplicationsPage />} />
         <Route path="/applications/:id" element={<ApplicationDetailPage />} />
         <Route path="/interviews" element={<InterviewsPage />} />
+        <Route path="/interview-prep" element={<InterviewPrepPage />} />
         <Route path="/companies" element={<CompaniesPage />} />
+        <Route path="/contacts" element={<ContactsPage />} />
         <Route path="/documents" element={<DocumentsPage />} />
         <Route path="/job-search" element={<JobSearchPage />} />
         <Route path="/tasks" element={<TasksPage />} />

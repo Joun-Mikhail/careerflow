@@ -15,7 +15,9 @@ if TYPE_CHECKING:
     from app.models.automation_rule import AutomationRule
     from app.models.certificate import Certificate
     from app.models.company import Company
+    from app.models.contact import Contact
     from app.models.cv import Cv
+    from app.models.interview_question import InterviewQuestion
     from app.models.job import Job
     from app.models.job_search_filter import JobSearchFilter
     from app.models.skill import Skill
@@ -55,6 +57,14 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         back_populates="user", cascade="all, delete-orphan"
     )
     automation_rules: Mapped[list[AutomationRule]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+
+    # Interview preparation and people.
+    interview_questions: Mapped[list[InterviewQuestion]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    contacts: Mapped[list[Contact]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
 

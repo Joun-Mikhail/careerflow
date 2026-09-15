@@ -13,6 +13,7 @@ from app.models.base import GUID, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKe
 
 if TYPE_CHECKING:
     from app.models.application import Application
+    from app.models.contact import Contact
     from app.models.user import User
 
 
@@ -33,6 +34,7 @@ class Company(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
 
     user: Mapped[User] = relationship(back_populates="companies")
     applications: Mapped[list[Application]] = relationship(back_populates="company")
+    contacts: Mapped[list[Contact]] = relationship(back_populates="company")
 
     def __repr__(self) -> str:  # pragma: no cover - debug helper
         return f"<Company id={self.id} name={self.name!r}>"

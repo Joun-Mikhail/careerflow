@@ -13,6 +13,7 @@ from app.models.attachment import Attachment
 from app.models.automation_rule import AutomationRule
 from app.models.certificate import Certificate
 from app.models.company import Company
+from app.models.contact import Contact
 from app.models.cv import Cv
 from app.models.enums import (
     ApplicationStatus,
@@ -27,6 +28,7 @@ from app.models.enums import (
     TaskPriority,
 )
 from app.models.interview import Interview
+from app.models.interview_question import InterviewQuestion
 from app.models.job import Job
 from app.models.job_search_filter import JobSearchFilter
 from app.models.note import Note
@@ -44,10 +46,12 @@ __all__ = [
     "AutomationRule",
     "Certificate",
     "Company",
+    "Contact",
     "Cv",
     "CvSource",
     "Interview",
     "InterviewMode",
+    "InterviewQuestion",
     "InterviewResult",
     "Job",
     "JobSearchFilter",
