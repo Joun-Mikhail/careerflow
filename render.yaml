@@ -2,17 +2,12 @@
 # https://render.com/docs/blueprint-spec
 #
 # Provisions:
-#   1. A managed PostgreSQL database
-#   2. The FastAPI backend (Docker, runs migrations + seeds demo data on first boot)
-#   3. The React frontend (static site, points at the backend URL)
+#   1. The FastAPI backend (Docker, runs migrations + seeds demo data on first boot)
+#   2. The React frontend (static site, points at the backend URL)
+#
+# The database is NOT provisioned here; set DATABASE_URL yourself (see below).
 #
 # Use the "Deploy to Render" button in the README, or `render blueprint launch`.
-databases:
-  - name: careerflow-db
-    plan: free
-    databaseName: careerflow
-    user: careerflow
-
 services:
   - type: web
     name: careerflow-api
@@ -23,10 +18,15 @@ services:
     healthCheckPath: /health
     autoDeploy: true
     envVars:
+      # Externally managed on purpose. Render's free PostgreSQL is deleted 30
+      # days after it is created: the database provisioned on 2026-07-27 was
+      # gone by 2026-08-26, which took the API down with it and is not
+      # something a redeploy can fix. Point this at a Postgres that outlives a
+      # month (Supabase, Neon, or a paid Render instance) and set it in the
+      # dashboard. Declaring it `sync: false` also stops a blueprint sync from
+      # overwriting the value with a regenerated free-database URL.
       - key: DATABASE_URL
-        fromDatabase:
-          name: careerflow-db
-          property: connectionString
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: CAREERFLOW_ENV

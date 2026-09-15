@@ -64,7 +64,7 @@ reminders, and analytics on what's converting.
 
 > Native iOS and Android apps build from the same codebase via Capacitor — see [`docs/app-store-submission.md`](docs/app-store-submission.md) for how to ship them.
 
-Want your own copy? Deploy the full stack (API + Postgres + web) with a single click:
+Want your own copy? Deploy the full stack with a single click:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Joun-Mikhail/careerflow)
 [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Joun-Mikhail/careerflow)
@@ -72,7 +72,7 @@ Want your own copy? Deploy the full stack (API + Postgres + web) with a single c
 
 | Button | What it provisions |
 | --- | --- |
-| **Render** | Backend (Docker) + managed Postgres + static frontend, all from [`render.yaml`](render.yaml). |
+| **Render** | Backend (Docker) + static frontend, from [`render.yaml`](render.yaml). Bring your own Postgres and set `DATABASE_URL` — Render's free database is deleted after 30 days. |
 | **Heroku** | Backend (container stack) + Heroku Postgres add-on, from [`app.json`](app.json). |
 | **Vercel** | Frontend only (point `VITE_API_BASE_URL` at any CareerFlow API). |
 
