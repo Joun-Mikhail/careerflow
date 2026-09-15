@@ -25,7 +25,7 @@ on:
       api_base:
         description: Backend origin (no trailing slash)
         required: true
-        default: https://careerflow-api-m4qf.onrender.com
+        default: https://careerflow-api-589d.onrender.com
 
 permissions: {}
 
@@ -43,7 +43,7 @@ jobs:
     steps:
       - name: GET /health
         env:
-          API_BASE: ${{ github.event.inputs.api_base || 'https://careerflow-api-m4qf.onrender.com' }}
+          API_BASE: ${{ github.event.inputs.api_base || 'https://careerflow-api-589d.onrender.com' }}
         run: |
           # Three attempts: a cold instance can exceed the first timeout while
           # it is still genuinely coming up, and that is not an outage.

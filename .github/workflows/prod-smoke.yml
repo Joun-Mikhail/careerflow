@@ -11,14 +11,14 @@ on:
       api_base:
         description: Backend origin (no trailing slash)
         required: true
-        default: https://careerflow-api-m4qf.onrender.com
+        default: https://careerflow-api-589d.onrender.com
       frontend_origin:
         description: Frontend origin used for the CORS preflight check
         required: true
         default: https://careerflow2.vercel.app
 
 env:
-  API_BASE: ${{ github.event.inputs.api_base || 'https://careerflow-api-m4qf.onrender.com' }}
+  API_BASE: ${{ github.event.inputs.api_base || 'https://careerflow-api-589d.onrender.com' }}
   FRONTEND_ORIGIN: ${{ github.event.inputs.frontend_origin || 'https://careerflow2.vercel.app' }}
 
 jobs:
