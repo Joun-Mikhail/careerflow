@@ -1,0 +1,60 @@
+name: Deploy CareerFlow to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy CareerFlow
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "======================================"
+            echo "Starting CareerFlow deployment"
+            echo "======================================"
+
+            cd /opt/careerflow
+
+            echo "Updating source code..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "Checking Docker..."
+            docker --version
+            docker compose version
+
+            echo "Building Docker images..."
+            docker compose build
+
+            echo "Starting CareerFlow..."
+            docker compose up -d
+
+            echo "Waiting for services..."
+            sleep 20
+
+            echo "Checking containers..."
+            docker compose ps
+
+            echo "Checking backend health..."
+            docker compose exec -T backend \
+              curl -fsS http://localhost:8000/health
+
+            echo "Checking frontend..."
+            curl -fsS http://localhost/ > /dev/null
+
+            echo "======================================"
+            echo "CareerFlow deployment successful!"
+            echo "======================================"
