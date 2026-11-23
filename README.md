@@ -147,7 +147,7 @@ It then launches in its own window, works offline for the shell, and shows up al
 The entire platform runs with one command (requires Docker):
 
 ```bash
-git clone <repo-url> careerflow
+git clone https://github.com/Joun-Mikhail/careerflow.git careerflow
 cd careerflow
 docker compose up --build
 ```
