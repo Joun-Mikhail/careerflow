@@ -8,6 +8,7 @@ Stop losing track of your job search across spreadsheets and inboxes — manage 
 from wishlist to offer, in one professional workspace.
 
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
+![CI](https://github.com/Joun-Mikhail/careerflow/actions/workflows/ci.yml/badge.svg)
 [![Mobile build](https://img.shields.io/badge/Mobile-iOS_·_Android-000?logo=apple&logoColor=white)](.github/workflows/mobile-build.yml)
 [![Backend](https://img.shields.io/badge/Python-3.11_·_3.12-3776AB?logo=python&logoColor=white)](backend/)
 [![Frontend](https://img.shields.io/badge/React_18-TypeScript-3178C6?logo=react&logoColor=white)](frontend/)
