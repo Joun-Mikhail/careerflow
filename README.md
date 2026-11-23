@@ -1,8 +1,6 @@
 <div align="center">
 
 # CareerFlow
-![CI](https://github.com/Joun-Mikhail/careerflow/actions/workflows/ci.yml/badge.svg)
-![Mobile Build](https://github.com/Joun-Mikhail/careerflow/actions/workflows/mobile-build.yml/badge.svg)
 
 **A modern SaaS platform for tracking job applications, interviews, tasks, and career opportunities.**
 
