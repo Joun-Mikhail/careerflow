@@ -1,437 +1,149 @@
-<div align="center">
-
 # CareerFlow
 
-**A modern SaaS platform for tracking job applications, interviews, tasks, and career opportunities.**
+A job-search tracker. It keeps every application, interview, task and offer in one place instead of a spreadsheet and an inbox.
 
-Stop losing track of your job search across spreadsheets and inboxes — manage your entire pipeline,
-from wishlist to offer, in one professional workspace.
+Full-stack web app: FastAPI and PostgreSQL on the backend, React and TypeScript on the frontend, installable as a PWA.
 
-[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
 ![CI](https://github.com/Joun-Mikhail/careerflow/actions/workflows/ci.yml/badge.svg)
-[![Mobile build](https://img.shields.io/badge/Mobile-iOS_·_Android-000?logo=apple&logoColor=white)](.github/workflows/mobile-build.yml)
-[![Backend](https://img.shields.io/badge/Python-3.11_·_3.12-3776AB?logo=python&logoColor=white)](backend/)
-[![Frontend](https://img.shields.io/badge/React_18-TypeScript-3178C6?logo=react&logoColor=white)](frontend/)
-[![Coverage](https://img.shields.io/badge/backend_coverage-97%25-brightgreen)](backend/)
 [![License](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 
 <img src="docs/screenshots/dashboard.png" alt="CareerFlow dashboard" width="860" />
 
-<sub>The dashboard, captured from the running application with seeded demo data.</sub>
-
-</div>
-
----
-
-## Table of contents
-
-- [Why CareerFlow](#why-careerflow)
-- [Features](#features)
-- [Tech stack](#tech-stack)
-- [Quick start](#quick-start)
-- [Architecture](#architecture)
-- [Data model (ERD)](#data-model-erd)
-- [Request lifecycle](#request-lifecycle)
-- [Project structure](#project-structure)
-- [Development](#development)
-- [Testing & quality](#testing--quality)
-- [Security](#security)
-- [Reliability & observability](#reliability--observability)
-- [Deployment](#deployment)
-- [Documentation](#documentation)
-- [Roadmap](#roadmap)
-- [Known limitations](#known-limitations)
-- [Future improvements](#future-improvements)
-- [License](#license)
-
-## Why CareerFlow
-
-A typical active job search runs 20–80 applications over several months. The information that
-matters — what stage each application is at, when the next interview is, who you spoke to, what
-follow-up is due — ends up scattered and forgotten. CareerFlow centralizes it into a single
-source of truth and turns it into something you can actually reason about, with a pipeline board,
-reminders, and analytics on what's converting.
-
-## Try it in 30 seconds
-
-**One link, every platform:**
-[**app.careerflow.app/install**](https://frontend-jade-two-zfchqjb5ws.vercel.app/install) — the page detects your device and points you at the App Store, Google Play, or the PWA install prompt.
-
-**Live demo on the web:** [frontend-jade-two-zfchqjb5ws.vercel.app](https://frontend-jade-two-zfchqjb5ws.vercel.app) — open it and press **▶ Try demo — no signup needed** on the login screen.
-
-[![App Store](https://img.shields.io/badge/App%20Store-coming%20soon-000?logo=apple&logoColor=white)](https://frontend-jade-two-zfchqjb5ws.vercel.app/install)
-[![Google Play](https://img.shields.io/badge/Google%20Play-coming%20soon-000?logo=googleplay&logoColor=white)](https://frontend-jade-two-zfchqjb5ws.vercel.app/install)
-[![Install PWA](https://img.shields.io/badge/Install%20PWA-from%20your%20browser-4f46e5)](https://frontend-jade-two-zfchqjb5ws.vercel.app)
-
-> Native iOS and Android apps build from the same codebase via Capacitor — see [`docs/app-store-submission.md`](docs/app-store-submission.md) for how to ship them.
-
-Want your own copy? Deploy the full stack with a single click:
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Joun-Mikhail/careerflow)
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Joun-Mikhail/careerflow)
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FJoun-Mikhail%2Fcareerflow&root-directory=frontend&env=VITE_API_BASE_URL&envDescription=Base+URL+of+your+CareerFlow+API+e.g.+https%3A%2F%2Fexample.com%2Fapi%2Fv1)
-
-| Button | What it provisions |
-| --- | --- |
-| **Render** | Backend (Docker) + static frontend, from [`render.yaml`](render.yaml). Bring your own Postgres and set `DATABASE_URL` — Render's free database is deleted after 30 days. |
-| **Heroku** | Backend (container stack) + Heroku Postgres add-on, from [`app.json`](app.json). |
-| **Vercel** | Frontend only (point `VITE_API_BASE_URL` at any CareerFlow API). |
-
-The seed routine creates a demo account on first boot — **`demo@careerflow.app` / `DemoPass123!`** — pre-wired to the Try-demo button.
-
-### Install as a native-feeling app
-
-CareerFlow is a **Progressive Web App**. From any modern browser:
-
-- **Chrome / Edge** — click the install icon (⊕) in the address bar, or *Menu → Install CareerFlow*.
-- **Safari (iOS / iPadOS)** — *Share → Add to Home Screen*.
-- **Firefox (Android)** — *Menu → Install*.
-
-It then launches in its own window, works offline for the shell, and shows up alongside your native apps. No store, no download.
+**Live demo:** [frontend-jade-two-zfchqjb5ws.vercel.app](https://frontend-jade-two-zfchqjb5ws.vercel.app) — press **Try demo** on the login screen, no signup needed
+(demo account: `demo@careerflow.app` / `DemoPass123!`, seeded with sample data).
+The API runs on a free hosting plan, so the first request after a quiet period can be slow.
 
 ## Features
 
-- 🔐 **Secure auth** — email/password registration, bcrypt hashing, short-lived JWT access tokens with **refresh-token rotation**, and fully user-scoped data.
-- 🏢 **Companies** — CRUD with search, industry filtering, and pagination.
-- 💼 **Application pipeline** — eight stages (Wishlist → Applied → Assessment → Interview → Final → Offer → Rejected → Accepted), shown as a **Kanban board** or a sortable list, with salary, location, source, and links.
-- 🗓️ **Interviews** — multiple rounds per application plus a dedicated cross-pipeline list filtered by upcoming/past.
-- 💰 **Offers** — track base salary, bonus, equity, benefits, and your decision (pending/negotiating/accepted/declined).
-- ✅ **Tasks** — priorities, due dates, completion, and semantic priority sorting.
-- 📝 **Notes** — Markdown notes per application.
-- 📎 **Attachments** — secure resume/cover-letter uploads (validated, owner-only download).
-- 📊 **Dashboard & analytics** — headline stats, upcoming interviews, pending tasks, and Recharts visualizations (applications over time, status & industry distribution, conversion rates).
-- 📤 **CSV export** — download your whole pipeline as an RFC-4180 CSV (Excel/Sheets-ready) in one click.
-- 📁 **Document vault** — store multiple CVs (PDF/DOCX), certificates, and skills; durable object storage (Cloudflare R2 / S3) with a local-disk fallback.
-- ✨ **AI CV tailoring** — rewrite a CV (and optional cover letter) for a specific job via OpenAI (gpt-4o-mini), saved as a new versioned CV. Falls back to an offline stub with no API key.
-- 🔎 **Job search** — save search filters and fetch matching jobs from Adzuna (with a mock provider when no keys are set); tailor a CV straight from a fetched job.
-- 🧠 **Interview prep** — a tagged question bank with your prepared answers, filterable by topic and markable as "actually asked", so the second interview builds on the first.
-- 👥 **Contacts** — recruiters, hiring managers and referrers, searchable and linked to companies; deleting a company keeps its people.
-- 🎯 **Match scoring** — score any fetched job against one of your CVs and see *why*: a skills/keywords/seniority breakdown plus the skills the posting asks for that your CV never mentions. Fully deterministic, so it needs no API key and costs nothing.
-- ⚙️ **Settings** — update your profile and change your password.
-- 📱 **Installable PWA + mobile UI** — install to a phone/desktop home screen; on small screens the sidebar becomes a slide-in drawer.
-- 🌗 **Polished UX** — responsive layout, light/dark themes, Zod-validated forms, and proper loading / empty / error states throughout.
+- **Pipeline** — applications move through eight stages (Wishlist → Applied → Assessment → Interview → Final → Offer → Rejected → Accepted), shown as a Kanban board or a sortable list.
+- **Per application** — interview rounds, offers (salary, bonus, equity, decision), tasks with due dates, Markdown notes and file attachments.
+- **Companies and contacts** — recruiters, hiring managers and referrers, linked to companies.
+- **Dashboard** — headline stats, upcoming interviews, pending tasks, and charts for applications over time, status and industry breakdown, and conversion rates.
+- **CSV export** of the whole pipeline.
+- **Document vault** for CVs and certificates.
+- **Job search** through the Adzuna API with saved filters, plus a match score between a posting and one of your CVs that lists the skills the posting asks for and the CV is missing. The score is rule-based, so it needs no external service.
+- **CV tailoring** for a specific posting through the OpenAI API, saved as a new CV version. Without an API key it falls back to an offline stub.
+- **Interview prep** — a question bank with your prepared answers, tagged by topic.
+- **Auth** — email/password, bcrypt hashing, short-lived JWT access tokens and refresh tokens. Every query is scoped to the logged-in user.
+- Responsive layout (sidebar becomes a drawer on phones), light and dark themes, installable as a PWA.
 
 ## Screenshots
 
-> Captured from the running app (`frontend/scripts/screenshot.mjs`) against the seeded demo data.
-
-<p align="center">
-  <img src="docs/screenshots/demo.gif" alt="CareerFlow walkthrough: dashboard, pipeline board, application detail, tasks, analytics" width="780" />
-</p>
-
-| Dashboard | Pipeline board |
+| Pipeline board | Application detail |
 | --- | --- |
-| <img src="docs/screenshots/dashboard.png" alt="Dashboard with headline stats, upcoming interviews and pending tasks" /> | <img src="docs/screenshots/applications-board.png" alt="Kanban pipeline board" /> |
-| **Application detail** | **Analytics** |
-| <img src="docs/screenshots/application-detail.png" alt="Application detail with interviews, notes, attachments" /> | <img src="docs/screenshots/analytics.png" alt="Analytics charts" /> |
-| **Offers** | **Interviews** |
-| <img src="docs/screenshots/offers.png" alt="Offers with salary, bonus, and decision status" /> | <img src="docs/screenshots/interviews.png" alt="Global interviews list" /> |
-
-<p align="center">
-  <img src="docs/screenshots/mobile-dashboard.png" alt="CareerFlow on mobile with the slide-in navigation drawer" width="300" />
-</p>
-<p align="center"><sub>On phones the sidebar collapses into a slide-in drawer — the app installs to your home screen as a PWA.</sub></p>
+| <img src="docs/screenshots/applications-board.png" alt="Kanban pipeline board" /> | <img src="docs/screenshots/application-detail.png" alt="Application detail with interviews, notes and attachments" /> |
+| **Analytics** | **Offers** |
+| <img src="docs/screenshots/analytics.png" alt="Analytics charts" /> | <img src="docs/screenshots/offers.png" alt="Offers with salary, bonus and decision status" /> |
 
 ## Tech stack
 
 | Layer | Technologies |
 | --- | --- |
-| **Frontend** | React 18, TypeScript, Vite, React Router, TanStack Query, Recharts |
-| **Backend** | Python 3.11/3.12, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2 |
-| **Database** | PostgreSQL 16 |
-| **Auth** | JWT (PyJWT), bcrypt |
-| **DevOps** | Docker, Docker Compose, Nginx, GitHub Actions |
-| **Quality** | Pytest, Vitest, Ruff, mypy, ESLint, Prettier, Bandit, pip-audit |
+| Frontend | React 18, TypeScript, Vite, React Router, TanStack Query, Recharts |
+| Backend | Python 3.11/3.12, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2 |
+| Database | PostgreSQL 16 |
+| Auth | JWT (PyJWT), bcrypt, rate limiting with SlowAPI |
+| DevOps | Docker, Docker Compose, Nginx, GitHub Actions |
+| Quality | pytest, Vitest, Ruff, mypy, ESLint, Bandit, pip-audit |
 
-## Quick start
+## Run it locally
 
-The entire platform runs with one command (requires Docker):
+With Docker:
 
 ```bash
-git clone https://github.com/Joun-Mikhail/careerflow.git careerflow
+git clone https://github.com/Joun-Mikhail/careerflow.git
 cd careerflow
 docker compose up --build
 ```
 
-| Service | URL |
-| --- | --- |
-| Web app | http://localhost:5173 |
-| API (Swagger UI) | http://localhost:8000/api/docs |
-| API (ReDoc) | http://localhost:8000/api/redoc |
-| Health probe | http://localhost:8000/health |
+- Web app: http://localhost:5173
+- API docs (Swagger): http://localhost:8000/api/docs
+- Health check: http://localhost:8000/health
 
-The backend applies migrations and seeds the demo account automatically on first start.
+The backend runs the database migrations and creates the demo account on first start.
 
-## Architecture
-
-Three tiers: a React SPA, a layered FastAPI backend, and PostgreSQL. In production Nginx serves
-the built SPA and reverse-proxies `/api` to the backend, so the browser sees a single origin.
-
-```mermaid
-flowchart LR
-    subgraph Browser
-        SPA["React SPA<br/>Vite · TanStack Query · Recharts"]
-    end
-    subgraph Edge["Edge (production)"]
-        NGINX["Nginx<br/>static assets + /api proxy"]
-    end
-    subgraph Backend["FastAPI backend"]
-        direction TB
-        ROUTERS["api/ routers<br/>(HTTP only)"]
-        SERVICES["services/<br/>(business rules + authz)"]
-        REPOS["repositories/<br/>(all SQL)"]
-        MODELS["models/<br/>(SQLAlchemy 2.0)"]
-        ROUTERS --> SERVICES --> REPOS --> MODELS
-    end
-    DB[("PostgreSQL")]
-    FILES[["Local file storage<br/>(off web root)"]]
-    SPA -->|HTTPS / JSON| NGINX
-    NGINX -->|/api/v1| ROUTERS
-    NGINX -->|static| SPA
-    MODELS --> DB
-    SERVICES --> FILES
-```
-
-The backend enforces a strict, inward-pointing dependency rule — **routers do HTTP, services hold
-business logic and authorization, repositories own all data access**. Details and rationale live in
-[docs/02-technical-architecture.md](docs/02-technical-architecture.md).
-
-## Data model (ERD)
-
-```mermaid
-erDiagram
-    USERS ||--o{ COMPANIES : owns
-    USERS ||--o{ APPLICATIONS : owns
-    USERS ||--o{ TASKS : owns
-    COMPANIES ||--o{ APPLICATIONS : "linked to (nullable)"
-    APPLICATIONS ||--o{ INTERVIEWS : has
-    APPLICATIONS ||--o{ NOTES : has
-    APPLICATIONS ||--o{ ATTACHMENTS : has
-    APPLICATIONS |o--o{ TASKS : "may relate to"
-
-    USERS {
-        uuid id PK
-        string email UK
-        string hashed_password
-        bool is_active
-    }
-    COMPANIES {
-        uuid id PK
-        uuid user_id FK
-        string name
-        string industry
-        datetime deleted_at
-    }
-    APPLICATIONS {
-        uuid id PK
-        uuid user_id FK
-        uuid company_id FK
-        string role_title
-        enum status
-        int salary_min
-        datetime deleted_at
-    }
-    INTERVIEWS {
-        uuid id PK
-        uuid application_id FK
-        datetime scheduled_at
-        enum result
-    }
-    TASKS {
-        uuid id PK
-        uuid application_id FK
-        string title
-        bool is_completed
-    }
-    NOTES {
-        uuid id PK
-        uuid application_id FK
-        text body
-    }
-    ATTACHMENTS {
-        uuid id PK
-        uuid application_id FK
-        enum kind
-    }
-```
-
-Full schema, indexes, and referential rules: [docs/03-database-design.md](docs/03-database-design.md).
-
-## Request lifecycle
-
-Creating an application, showing validation, authorization, and the layer hand-off:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant B as Browser (SPA)
-    participant R as Router (api/)
-    participant S as ApplicationService
-    participant Repo as Repositories
-    participant DB as PostgreSQL
-    B->>R: POST /api/v1/applications (Bearer JWT)
-    R->>R: Validate body (Pydantic) + decode JWT
-    R->>S: create(owner, data)
-    opt company_id provided
-        S->>Repo: company owned by user?
-        Repo->>DB: SELECT company WHERE id AND user_id
-        Repo-->>S: Company or NotFound(404)
-    end
-    S->>Repo: add(application)
-    Repo->>DB: INSERT application
-    S-->>R: Application
-    R-->>B: 201 Created (ApplicationRead)
-```
-
-The authentication flow is diagrammed in
-[docs/diagrams/sequence-auth.mmd](docs/diagrams/sequence-auth.mmd).
-
-## Project structure
-
-```
-careerflow/
-├── backend/            FastAPI service (layered: api · services · repositories · models)
-│   ├── app/
-│   ├── alembic/        database migrations
-│   └── tests/          unit + integration tests
-├── frontend/           React + TypeScript SPA (Vite)
-│   └── src/            pages · components · hooks · services · contexts
-├── docs/               PRD, architecture, DB & API design, security, diagrams
-├── .github/workflows/  CI pipeline
-└── docker-compose.yml  full-stack one-command startup
-```
-
-A deeper tour is in [docs/06-folder-structure.md](docs/06-folder-structure.md).
-
-## Development
-
-Run the apps natively for a tighter feedback loop.
-
-**Backend** (Python ≥ 3.11):
+Without Docker:
 
 ```bash
+# Backend (Python 3.11+)
 cd backend
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 cp .env.example .env
 alembic upgrade head
 uvicorn app.main:app --reload
-```
 
-**Frontend** (Node ≥ 20):
-
-```bash
+# Frontend (Node 20+), in a second terminal
 cd frontend
 npm install
-npm run dev      # http://localhost:5173, proxies /api to the backend
+npm run dev
 ```
 
-## Testing & quality
+## Architecture
 
-Every change is gated by the same checks CI runs.
+```mermaid
+flowchart LR
+    SPA["React SPA"] -->|HTTPS / JSON| NGINX["Nginx<br/>static files + /api proxy"]
+    NGINX -->|/api/v1| ROUTERS
+    subgraph Backend["FastAPI backend"]
+        direction TB
+        ROUTERS["api/ routers<br/>(HTTP only)"] --> SERVICES["services/<br/>(business rules, authorization)"] --> REPOS["repositories/<br/>(all SQL)"]
+    end
+    REPOS --> DB[("PostgreSQL")]
+    SERVICES --> FILES[["File storage<br/>(local disk or S3-compatible)"]]
+```
+
+The backend is split into layers: routers only handle HTTP, services hold the business rules and ownership checks, and repositories do all database access. In production Nginx serves the built frontend and proxies `/api` to the backend, so the browser talks to a single origin.
+
+More detail: [architecture](docs/02-technical-architecture.md), [database design](docs/03-database-design.md), [API design](docs/04-api-design.md).
+
+## Tests and CI
 
 ```bash
-# Backend
 cd backend
-ruff check . && ruff format --check . && mypy app
-bandit -r app && pip-audit
-pytest --cov --cov-report=term-missing      # ~97% line coverage
+ruff check . && mypy app
+pytest --cov
 
-# Frontend
 cd frontend
-npm run lint && npm run typecheck && npm test && npm run build
+npm run lint && npm run typecheck && npm test
 ```
 
-The backend suite (83 tests) runs against in-memory SQLite for speed and isolation; the production
-target is PostgreSQL. CI enforces a **minimum 80% backend coverage** and builds both Docker images.
+The backend tests run against in-memory SQLite. Production uses PostgreSQL.
+On every push, CI runs linting, type checks, Bandit, pip-audit and both test suites, builds both Docker images, and fails if backend coverage drops below 80%.
 
 ## Security
 
-CareerFlow was built with a security-first mindset and audited in a dedicated phase:
+- Each user only sees their own data. Requests for another user's records return `404`.
+- Passwords are hashed with bcrypt, and login errors don't reveal whether an email exists.
+- Login, token refresh and password change are rate-limited.
+- Uploads are checked for type and size and stored under random names outside the web root.
 
-- All data is **user-scoped**; cross-user access returns `404` (no existence leak).
-- Passwords are **bcrypt**-hashed; auth errors are generic to prevent enumeration.
-- Inputs are validated by Pydantic and persisted via bound parameters (no SQL injection).
-- Uploads are type/size-validated, stored off the web root with opaque names, and served
-  only to their owner.
-- **Rate limiting** on the auth endpoints (`/auth/login`, `/auth/refresh`,
-  `/auth/change-password`) via SlowAPI, returning `429` with `Retry-After` and
-  `X-RateLimit-*` headers.
-- `bandit` and `pip-audit` run in CI and are currently clean.
-
-See [docs/05-security-design.md](docs/05-security-design.md) and the audit in
-[docs/security-review.md](docs/security-review.md).
-
-## Reliability & observability
-
-- **Global error boundary** — render-time exceptions show a recoverable
-  fallback ("Reload app") instead of a blank screen, and are reported to Sentry.
-- **Loading skeletons** — board, table, and detail views render shape-matching
-  skeletons while data loads, keeping layout stable.
-- **Toast notifications** — non-blocking success/error toasts on login, profile
-  and password changes, and offer/interview actions.
-- **Structured audit logging** — security-relevant actions (logins, password
-  changes, profile updates, offer decisions) emit one JSON line each with
-  timestamp, `user_id`, `action`, and `status` to a dedicated `careerflow.audit`
-  logger.
-- **Health probe** — `GET /health` reports database connectivity, app version,
-  and uptime, and returns `503` when the database is unreachable.
-- **Cold-start mitigation** — a scheduled workflow pings `/health` every 10
-  minutes so free-tier instances rarely suspend, and any wait that does happen
-  is explained in the UI rather than shown as a bare spinner. See
-  [docs/deploy-runbook.md](docs/deploy-runbook.md#cold-starts-on-free-plans).
-- **Error monitoring (Sentry)** — optional, env-gated on both the API
-  (`SENTRY_DSN`) and the SPA (`VITE_SENTRY_DSN`); a no-op when unset.
-
-## Deployment
-
-The repository is container-first. `docker compose up --build` is production-shaped: the backend
-image runs migrations on start, and Nginx serves the built SPA while proxying the API. For a real
-deployment, override the defaults in a root `.env` (see [.env.example](.env.example)) — at minimum a
-strong `JWT_SECRET` and managed Postgres credentials; the app refuses to start in `production` with a
-placeholder secret.
-
-## Documentation
-
-| Document | Contents |
-| --- | --- |
-| [Product Requirements](docs/01-product-requirements.md) | Problem, personas, journeys, functional & non-functional requirements |
-| [Technical Architecture](docs/02-technical-architecture.md) | Layering, technology rationale, boundaries |
-| [Database Design](docs/03-database-design.md) | Tables, indexes, soft-delete & referential rules |
-| [API Design](docs/04-api-design.md) | Endpoints, pagination, error format, examples |
-| [Security Design](docs/05-security-design.md) / [Security Review](docs/security-review.md) | Threat model, controls, audit findings |
-| [Deployment Guide](docs/deployment.md) | Hosting the frontend, backend, and database |
-| [Runtime Verification](docs/verification.md) | Evidence from actual builds and runs |
-| [Folder Structure](docs/06-folder-structure.md) | Repository layout and conventions |
-| [Backend Review](docs/backend-architecture-review.md) / [Repository Audit](docs/repository-audit.md) | Self-reviews and refactors |
-
-Interactive API docs are generated from the code at `/api/docs` (Swagger) and `/api/redoc`.
-
-## Roadmap
-
-- [x] Core domain: companies, applications, interviews, tasks, notes, attachments
-- [x] Dashboard & analytics
-- [x] Containerized stack + CI
-- [ ] Drag-and-drop status changes on the board
-- [ ] Email/calendar reminders for upcoming interviews
-- [ ] CSV/JSON export of the pipeline
-- [ ] Saved views and bulk actions
+Details: [security design](docs/05-security-design.md).
 
 ## Known limitations
 
-- Single-user accounts only (no shared workspaces or collaboration).
-- Editing an application from its detail page lists only its current company in the picker;
-  reassignment is available from the create flow.
-- Attachments are stored on local disk (a volume in Compose) rather than object storage.
-- The board groups rejected applications outside the visible pipeline columns (they remain in the list view).
+- One user per account, with no shared workspaces.
+- Used refresh tokens are not revoked yet, so a stolen refresh token stays valid until it expires.
+- Application attachments are stored on local disk. Only the document vault (CVs, certificates) can use S3-compatible storage.
+- The board has no drag-and-drop yet. Status is changed from the application.
+- The iOS and Android builds (Capacitor) are set up but not published to the app stores.
 
-## Future improvements
+## Roadmap
 
-- Refresh-token rotation and token revocation.
-- Pluggable object storage (S3-compatible) for attachments.
-- Full-text search across notes and applications.
-- Optimistic UI updates and drag-and-drop on the pipeline board.
+- [x] Applications, interviews, tasks, notes, attachments
+- [x] Dashboard and analytics
+- [x] CSV export
+- [x] Docker setup and CI
+- [ ] Drag-and-drop on the pipeline board
+- [ ] Revoke refresh tokens after use
+- [ ] S3-compatible storage for application attachments
+- [ ] Email or calendar reminders for upcoming interviews
+- [ ] Full-text search across notes
+
+## Deployment
+
+Deployment guides for Vercel + Railway + Neon, Render (`render.yaml`) and Heroku (`app.json`) are in [docs/deployment.md](docs/deployment.md) and [docs/deploy-runbook.md](docs/deploy-runbook.md). In production the app refuses to start with the placeholder `JWT_SECRET`.
 
 ## License
 
-[MIT](LICENSE) © 2026 CareerFlow
+[MIT](LICENSE) © 2026 Joun Mikhail

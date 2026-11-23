@@ -108,7 +108,7 @@ path the browser never makes cross-origin calls, so CORS is a non-issue.
 On any VM with Docker installed:
 
 ```bash
-git clone <repo-url> careerflow && cd careerflow
+git clone https://github.com/Joun-Mikhail/careerflow.git && cd careerflow
 cp .env.example .env          # set a strong JWT_SECRET and DB credentials
 docker compose up -d --build
 ```
