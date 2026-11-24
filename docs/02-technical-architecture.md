@@ -96,8 +96,8 @@ a layer for business logic.
 Separation of concerns makes each layer independently testable: services are
 unit-tested with fake/SQLite-backed repositories; repositories are tested
 against a real database; routers are covered by integration tests through the
-ASGI app. It also keeps routes thin and prevents the "fat controller" anti-
-pattern that makes codebases look AI-generated and hard to maintain.
+ASGI app. It also keeps routes thin and avoids the "fat controller" anti-pattern,
+where one route handler mixes HTTP, business rules and SQL and becomes hard to change.
 
 ## 4. Request lifecycle (example: `POST /api/v1/applications`)
 
